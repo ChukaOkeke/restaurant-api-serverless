@@ -1,4 +1,7 @@
-# Define the variables
+# ==========================================
+# DEFINE THE GLOBAL PROJECT VARIABLES
+# This file passes the configuration values from your execution environment down into the root orchestrator.
+# ==========================================
 
 variable "aws_profile" {
   description = "The AWS CLI profile to use"
@@ -12,3 +15,8 @@ variable "aws_region" {
   default = "eu-west-1"
 }
 
+variable "environment" {
+  description = "Deployment environment name"
+  type        = string
+  default     = "production"
+}
