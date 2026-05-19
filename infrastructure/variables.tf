@@ -50,5 +50,5 @@ variable "private_subnets" {
 variable "db_port" {
   type        = number
   description = "The network port for the database cluster"
-  default     = 3306 # Defaulting to MySQL for clean setup
+  default     = 5432 # Defaulting to PostgreSQL for clean setup
 }
