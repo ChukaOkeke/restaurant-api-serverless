@@ -3,10 +3,10 @@ terraform {
   backend "s3" {
     bucket         = "chuka-devops-state-storage" # The unique bucket name
     key            = "dev/restaurant-api-serverless/terraform.tfstate"
-    region         = "eu-west-1"  
+    region         = "eu-west-1"
     dynamodb_table = "terraform-state-locking"
     encrypt        = true
-    profile = "iamadmin-project" 
+    profile        = "iamadmin-project"
   }
 }
 

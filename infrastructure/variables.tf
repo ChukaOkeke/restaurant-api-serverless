@@ -5,14 +5,14 @@
 
 variable "aws_profile" {
   description = "The AWS CLI profile to use"
-  type = string
-  default = "iamadmin-project"
+  type        = string
+  default     = "iamadmin-project"
 }
 
 variable "aws_region" {
   description = "The AWS region to deploy resources in"
-  type = string
-  default = "eu-west-1"
+  type        = string
+  default     = "eu-west-1"
 }
 
 variable "environment" {
