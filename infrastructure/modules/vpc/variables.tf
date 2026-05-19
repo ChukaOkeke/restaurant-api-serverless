@@ -1,4 +1,6 @@
-# Explicit configuration values for the VPC module
+# =========================================================================
+#  EXPLICIT CONFIGURATION VALUES FOR THE VPC MODULE
+# =========================================================================
 variable "environment" {
   type        = string
   description = "Deployment environment name"
@@ -17,4 +19,9 @@ variable "public_subnets" {
 variable "private_subnets" {
   type = map(string)
   description = "Map of Availability Zones to Private Subnet IPv4 CIDRs"
+}
+
+variable "db_port" {
+  type        = number
+  description = "The database port (e.g., 5432 for PostgreSQL, 3306 for MySQL)"
 }

@@ -1,6 +1,9 @@
-# Core Engine/Orchestrator for the VPC module, responsible for creating the VPC and its associated resources
+# =========================================================================
+#  CORE ENGINE/ORCHESTRATOR FOR THE VPC MODULE
+#  RESPONSIBLE FOR CREATING THE VPC AND ITS ASSOCIATED RESOURCES
+# =========================================================================
 
-# 1. Custom VPC in eu-west-1 region
+# 1. CUSTOM VPC IN EU-WEST-1 REGION
 resource "aws_vpc" "asgard_vpc" {
   cidr_block           = var.vpc_cidr
 
@@ -14,7 +17,7 @@ resource "aws_vpc" "asgard_vpc" {
   }
 }
 
-# 2. Internet Gateway for public subnet internet access
+# 2. INTERNET GATEWAY FOR PUBLIC SUBNET INTERNET ACCESS
 resource "aws_internet_gateway" "asgard_igw" {
   vpc_id = aws_vpc.asgard_vpc.id
 
@@ -23,7 +26,7 @@ resource "aws_internet_gateway" "asgard_igw" {
   }
 }
 
-# 3. Public Subnets
+# 3. PUBLIC SUBNETS
 resource "aws_subnet" "public_sn" {
   for_each = var.public_subnets
 
@@ -40,7 +43,7 @@ resource "aws_subnet" "public_sn" {
   }
 }
 
-# 4. Private Subnets (Where Lambdas, Aurora, & Endpoints will live)
+# 4. PRIVATE SUBNETS (WHERE LAMBDAS, AURORA, & ENDPOINTS WILL LIVE)
 resource "aws_subnet" "private_sn" {
   for_each = var.private_subnets
 
@@ -56,7 +59,7 @@ resource "aws_subnet" "private_sn" {
   }
 }
 
-# 5. Public Route Table & Internet Route
+# 5. PUBLIC ROUTE TABLE & INTERNET ROUTE
 resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.asgard_vpc.id
 
@@ -70,7 +73,7 @@ resource "aws_route_table" "public_rt" {
   }
 }
 
-# 6. Private Route Table (Completely isolated; no NAT Gateway route)
+# 6. PRIVATE ROUTE TABLE (COMPLETELY ISOLATED; NO NAT GATEWAY ROUTE)
 resource "aws_route_table" "private_rt" {
   vpc_id = aws_vpc.asgard_vpc.id
 
@@ -79,7 +82,7 @@ resource "aws_route_table" "private_rt" {
   }
 }
 
-# 7. Route Table Associations
+# 7. ROUTE TABLE ASSOCIATIONS
 resource "aws_route_table_association" "public" {
   for_each = aws_subnet.public_sn
 
