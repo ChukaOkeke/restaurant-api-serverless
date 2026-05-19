@@ -5,7 +5,7 @@
 
 # 1. CUSTOM VPC IN EU-WEST-1 REGION
 resource "aws_vpc" "asgard_vpc" {
-  cidr_block           = var.vpc_cidr
+  cidr_block = var.vpc_cidr
 
   # DNS Configuration
   enable_dns_hostnames = true # Enables the Amazon DNS server (169.254.169.253)
@@ -33,13 +33,13 @@ resource "aws_subnet" "public_sn" {
   vpc_id            = aws_vpc.asgard_vpc.id
   cidr_block        = each.value
   availability_zone = each.key
-  
+
   # Ensures resources dropped here get public IPs if needed down the road
-  map_public_ip_on_launch = true 
+  map_public_ip_on_launch = true
 
   tags = {
-    Name        = "asgard-${var.environment}-public-sn-${each.key}"
-    Type        = "Public"
+    Name = "asgard-${var.environment}-public-sn-${each.key}"
+    Type = "Public"
   }
 }
 
@@ -50,12 +50,12 @@ resource "aws_subnet" "private_sn" {
   vpc_id            = aws_vpc.asgard_vpc.id
   cidr_block        = each.value
   availability_zone = each.key
-  
+
   map_public_ip_on_launch = false
 
   tags = {
-    Name        = "asgard-${var.environment}-private-sn-${each.key}"
-    Type        = "Private"
+    Name = "asgard-${var.environment}-private-sn-${each.key}"
+    Type = "Private"
   }
 }
 
@@ -64,7 +64,7 @@ resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.asgard_vpc.id
 
   route {
-    cidr_block = "0.0.0.0/0"  # Default Route to route all IPv4 traffic
+    cidr_block = "0.0.0.0/0"                        # Default Route to route all IPv4 traffic
     gateway_id = aws_internet_gateway.asgard_igw.id # Target the created Internet Gateway
   }
 

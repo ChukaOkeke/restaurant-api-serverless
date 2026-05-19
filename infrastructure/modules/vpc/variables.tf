@@ -12,12 +12,12 @@ variable "vpc_cidr" {
 }
 
 variable "public_subnets" {
-  type = map(string)
+  type        = map(string)
   description = "Map of Availability Zones to Public Subnet IPv4 CIDRs"
 }
 
 variable "private_subnets" {
-  type = map(string)
+  type        = map(string)
   description = "Map of Availability Zones to Private Subnet IPv4 CIDRs"
 }
 
