@@ -2,7 +2,7 @@
 # ROOT MODULE FOR ENVIRONMENT ORCHESTRATION: ASGARD CUISINES
 # ==========================================
 
-# Create the VPC and its associated resources (subnets, route tables, etc.)
+# Create the VPC and its associated resources (subnets, route tables, security groups, interface endpoints etc.)
 module "vpc" {
   source      = "./modules/vpc"
 
@@ -11,4 +11,5 @@ module "vpc" {
   vpc_cidr    = var.vpc_cidr
   public_subnets  = var.public_subnets
   private_subnets = var.private_subnets
+  db_port         = var.db_port
 }

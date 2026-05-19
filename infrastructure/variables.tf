@@ -46,3 +46,9 @@ variable "private_subnets" {
     "eu-west-1c" = "10.16.12.0/24"
   }
 }
+
+variable "db_port" {
+  type        = number
+  description = "The network port for the database cluster"
+  default     = 3306 # Defaulting to MySQL for clean setup
+}
