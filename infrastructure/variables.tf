@@ -21,6 +21,8 @@ variable "environment" {
   default     = "production"
 }
 
+
+# VPC CONFIGURATION VALUES
 variable "vpc_cidr" {
   type        = string
   description = "Base CIDR block for the custom VPC"
@@ -51,4 +53,37 @@ variable "db_port" {
   type        = number
   description = "The network port for the database cluster"
   default     = 5432 # Defaulting to PostgreSQL for clean setup
+}
+
+
+# MESSAGING CONFIGURATION VALUES (Asynchronous Queue Tuning)
+
+variable "queue_delay_seconds" {
+  type        = number
+  default     = 0
+}
+
+variable "max_message_size" {
+  type        = number
+  default     = 262144 # 256 KB (AWS Max standard)
+}
+
+variable "queue_retention_seconds" {
+  type        = number
+  default     = 345600 # 4 Days
+}
+
+variable "visibility_timeout_seconds" {
+  type        = number
+  default     = 30 # Matches standard default Lambda timeout nicely
+}
+
+variable "dlq_retention_seconds" {
+  type        = number
+  default     = 1209600 # 14 Days (Max allowable to store errors for investigation)
+}
+
+variable "max_receive_count" {
+  type        = number
+  default     = 5 # Retry 5 times before failing to DLQ
 }

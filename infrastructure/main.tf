@@ -25,3 +25,16 @@ module "aurora" {
   private_subnet_ids = module.vpc.private_subnet_ids
   database_sg_id     = module.vpc.database_sg_id
 }
+
+# Create the SQS Queues for asynchronous decoupling of the booking process
+module "messaging" {
+  source = "./modules/messaging"
+
+  environment                = var.environment
+  queue_delay_seconds        = var.queue_delay_seconds
+  max_message_size           = var.max_message_size
+  queue_retention_seconds    = var.queue_retention_seconds
+  visibility_timeout_seconds = var.visibility_timeout_seconds
+  dlq_retention_seconds      = var.dlq_retention_seconds
+  max_receive_count          = var.max_receive_count
+}
