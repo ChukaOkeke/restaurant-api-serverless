@@ -1,6 +1,6 @@
-# ==========================================
+# ===========================================================
 # ROOT MODULE FOR ENVIRONMENT ORCHESTRATION: ASGARD CUISINES
-# ==========================================
+# ===========================================================
 
 # Create the VPC and its associated resources (subnets, route tables, security groups, interface endpoints etc.)
 module "vpc" {
@@ -12,4 +12,16 @@ module "vpc" {
   public_subnets  = var.public_subnets
   private_subnets = var.private_subnets
   db_port         = var.db_port
+}
+
+# Create the Aurora Serverless v2 Cluster and its associated resources (DB Subnet Group, Cluster Instance etc.)
+module "aurora" {
+  source = "./modules/aurora"
+
+  environment        = var.environment
+  
+  # Passing the outputs from the VPC module straight into the Aurora module.
+  vpc_id             = module.vpc.vpc_id
+  private_subnet_ids = module.vpc.private_subnet_ids
+  database_sg_id     = module.vpc.database_sg_id
 }
