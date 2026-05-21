@@ -38,3 +38,12 @@ module "messaging" {
   dlq_retention_seconds      = var.dlq_retention_seconds
   max_receive_count          = var.max_receive_count
 }
+
+# Create the IAM Role for GitHub Actions OIDC authentication and the Secrets Manager container for application secrets
+module "security" {
+  source = "./modules/security"
+
+  environment = var.environment
+  github_org  = var.github_org
+  github_repo = var.github_repo
+}

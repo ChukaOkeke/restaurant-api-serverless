@@ -16,3 +16,8 @@ output "database_credentials_secret_arn" {
   value       = module.aurora.rds_secret_arn
   description = "The AWS Secrets Manager ARN managing your RDS master credentials."
 }
+
+output "github_actions_deployment_role_arn" {
+  value       = module.security.github_actions_role_arn
+  description = "Inject this ARN straight into your github workflow configurations."
+}

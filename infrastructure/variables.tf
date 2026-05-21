@@ -22,7 +22,7 @@ variable "environment" {
 }
 
 
-# VPC CONFIGURATION VALUES
+# VPC CONFIGURATIONS
 variable "vpc_cidr" {
   type        = string
   description = "Base CIDR block for the custom VPC"
@@ -56,7 +56,7 @@ variable "db_port" {
 }
 
 
-# MESSAGING CONFIGURATION VALUES (Asynchronous Queue Tuning)
+# MESSAGING CONFIGURATIONS (Asynchronous Queue Tuning)
 
 variable "queue_delay_seconds" {
   type        = number
@@ -86,4 +86,19 @@ variable "dlq_retention_seconds" {
 variable "max_receive_count" {
   type        = number
   default     = 5 # Retry 5 times before failing to DLQ
+}
+
+
+# SECURITY CONFIGURATIONS (OIDC CI/CD Settings)
+
+variable "github_org" {
+  type        = string
+  description = "Your GitHub username or organization name"
+  default     = "ChukaOkeke" # Replace with your real target github name
+}
+
+variable "github_repo" {
+  type        = string
+  description = "The exact application repository name matching your workplace path"
+  default     = "restaurant-api-serverless" # Replace with your real target repo name
 }
