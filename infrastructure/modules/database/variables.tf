@@ -1,5 +1,5 @@
 # =========================================================================
-#  EXPLICIT CONFIGURATION VALUES FOR THE AURORA DATABASE MODULE
+#  CONFIGURATIONS FOR THE AURORA DATABASE MODULE
 # =========================================================================
 variable "environment" {
   type        = string
