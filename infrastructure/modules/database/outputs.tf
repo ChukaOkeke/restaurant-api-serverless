@@ -1,6 +1,6 @@
 # =========================================================================
-#  AURORA DB MODULE OUTPUTS
-#  Allows us to pass data from the Aurora module to other modules that depend on it, in the root module
+#  DATABASE MODULE OUTPUTS
+#  Allows us to pass data from the Database module to other modules that depend on it, in the root module
 # =========================================================================
 
 output "cluster_endpoint" {

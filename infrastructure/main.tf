@@ -15,12 +15,12 @@ module "vpc" {
 }
 
 # Create the Aurora Serverless v2 Cluster and its associated resources (DB Subnet Group, Cluster Instance etc.)
-module "aurora" {
-  source = "./modules/aurora"
+module "database" {
+  source = "./modules/database"
 
   environment        = var.environment
   
-  # Passing the outputs from the VPC module straight into the Aurora module.
+  # Passing the outputs from the VPC module straight into the Database module.
   vpc_id             = module.vpc.vpc_id
   private_subnet_ids = module.vpc.private_subnet_ids
   database_sg_id     = module.vpc.database_sg_id

@@ -1,4 +1,4 @@
-# Version constraints for the Aurora module
+# Version constraints for the Database module
 
 terraform {
   required_version = ">= 1.5.0"
