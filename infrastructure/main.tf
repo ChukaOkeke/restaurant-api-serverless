@@ -53,3 +53,24 @@ module "storage" {
   source      = "./modules/storage"
   environment = var.environment
 }
+
+# Create Lambda Serverless Infrastructure for both the Web API and the Asynchronous Queue Worker
+module "compute" {
+  source = "./modules/compute"
+
+  environment        = var.environment
+  private_subnet_ids = module.vpc.private_subnet_ids
+  lambda_sg_id       = module.vpc.lambda_sg_id
+
+  # Storage references
+  s3_bucket_id     = module.storage.bucket_name
+  s3_bootstrap_key = module.storage.bootstrap_object_key
+
+  # Messaging queues references
+  sqs_queue_arn = module.messaging.queue_arn
+  sqs_queue_id  = module.messaging.queue_id
+
+  # Security / Secrets handles references
+  rds_secret_arn  = module.database.rds_secret_arn
+  app_secrets_arn = module.security.app_secrets_arn
+}
