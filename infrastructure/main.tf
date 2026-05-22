@@ -47,3 +47,9 @@ module "security" {
   github_org  = var.github_org
   github_repo = var.github_repo
 }
+
+# Create the S3 bucket for Lambda deployment artifacts
+module "storage" {
+  source      = "./modules/storage"
+  environment = var.environment
+}
