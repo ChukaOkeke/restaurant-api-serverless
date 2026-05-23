@@ -3,9 +3,10 @@
 # This file initializes the downloaded AWS provider binary and applies the operational rules, like the region and AWS account selection, and the global FinOps tagging strategy.
 # ==========================================
 
+# Primary Regional Provider
 provider "aws" {
-  region  = var.aws_region
-  profile = var.aws_profile # Specify the AWS CLI profile 
+  region  = var.aws_primary_region
+  profile = var.aws_primary_profile # Specify the AWS CLI profile 
   # Access keys can be set in the environment variables or through the AWS CLI configuration
 
   # Cascades the granular tagging strategy down to every single sub-resource
@@ -17,4 +18,11 @@ provider "aws" {
       ManagedBy   = "Terraform"
     }
   }
+}
+
+# Global Edge Provider (For CloudFront WAF & ACM Certificate compliance)
+provider "aws" {
+  alias  = "us_east_1"
+  region = var.aws_cloudfront_compliance_region
+  profile = var.aws_cloudfront_compliance_profile # Specify the AWS CLI profile
 }

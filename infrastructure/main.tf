@@ -46,6 +46,12 @@ module "security" {
   environment = var.environment
   github_org  = var.github_org
   github_repo = var.github_repo
+
+  # Explicit multi-region mapping authorization
+  providers = {
+    aws           = aws
+    aws.us_east_1 = aws.us_east_1
+  }
 }
 
 # Create the S3 bucket for Lambda deployment artifacts
@@ -73,4 +79,32 @@ module "compute" {
   # Security / Secrets handles references
   rds_secret_arn  = module.database.rds_secret_arn
   app_secrets_arn = module.security.app_secrets_arn
+}
+
+# Create the Ingress components including Route53, CloudFront, WAF and ACM for the API Gateway distribution, and link it to the Web API Lambda function
+# =========================================================================
+# ROOT LEVEL: main.tf (Module Wiring Execution)
+# =========================================================================
+
+# ... (VPC, Database, Messaging, and Security modules run up here) ...
+
+module "ingress" {
+  source = "./modules/ingress"
+
+  environment           = var.environment
+  domain_name           = var.domain_name
+  subdomain_name        = var.subdomain_name
+  
+  # Handover parameters consumed out of your Compute module
+  web_api_function_arn  = module.compute.web_api_function_arn
+  web_api_function_name = module.compute.web_api_function_name
+  
+  # Handover parameter consumed out of your Security/WAF module
+  cloudfront_waf_arn    = module.security.cloudfront_waf_arn
+
+  # Explicit multi-region mapping authorization
+  providers = {
+    aws           = aws
+    aws.us_east_1 = aws.us_east_1
+  }
 }
