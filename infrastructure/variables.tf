@@ -3,16 +3,28 @@
 # This file passes the configuration values from your execution environment down into the root orchestrator.
 # ==========================================
 
-variable "aws_profile" {
-  description = "The AWS CLI profile to use"
+variable "aws_primary_profile" {
+  description = "The primary AWS CLI profile to use"
   type        = string
   default     = "iamadmin-project"
 }
 
-variable "aws_region" {
-  description = "The AWS region to deploy resources in"
+variable "aws_primary_region" {
+  description = "The primary AWS region to deploy resources in"
   type        = string
   default     = "eu-west-1"
+}
+
+variable "aws_cloudfront_compliance_profile" {
+  description = "The AWS CLI profile to use for CloudFront compliance resources"
+  type        = string
+  default     = "iamadmin-project-us-east-1"
+}
+
+variable "aws_cloudfront_compliance_region" {
+  description = "The AWS region to deploy WAF and ACM for CloudFront in"
+  type        = string
+  default     = "us-east-1"
 }
 
 variable "environment" {
@@ -101,4 +113,18 @@ variable "github_repo" {
   type        = string
   description = "The exact application repository name matching your workplace path"
   default     = "restaurant-api-serverless" # Replace with your real target repo name
+}
+
+
+# ROUTE53 DNS CONFIGURATIONS
+variable "domain_name" {
+  type        = string
+  default     = "asgardcuisines.com" # Replace with your real registered domain name
+  description = "Your registered custom base apex domain zone"
+}
+
+variable "subdomain_name" {
+  type        = string
+  default     = "api.asgardcuisines.com" # Replace with your real target subdomain for the API
+  description = "The target endpoint route for client traffic entry"
 }

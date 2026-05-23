@@ -12,3 +12,8 @@ output "app_secrets_arn" {
   value       = aws_secretsmanager_secret.app_secrets.arn
   description = "The absolute identifier pointer for the Django runtime Secrets Manager container."
 }
+
+output "cloudfront_waf_arn" {
+  value       = aws_wafv2_web_acl.cloudfront_waf.arn
+  description = "The global ARN handle of the edge firewall perimeter."
+}
