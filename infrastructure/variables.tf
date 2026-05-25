@@ -119,12 +119,6 @@ variable "github_repo" {
 # ROUTE53 DNS CONFIGURATIONS
 variable "domain_name" {
   type        = string
-  default     = "asgardcuisines.com" # Replace with your real registered domain name
+  default     = "asgardcuisines.link" # Replace with your real registered domain name
   description = "Your registered custom base apex domain zone"
-}
-
-variable "subdomain_name" {
-  type        = string
-  default     = "api.asgardcuisines.com" # Replace with your real target subdomain for the API
-  description = "The target endpoint route for client traffic entry"
 }

@@ -93,7 +93,6 @@ module "ingress" {
 
   environment           = var.environment
   domain_name           = var.domain_name
-  subdomain_name        = var.subdomain_name
   
   # Handover parameters consumed out of your Compute module
   web_api_function_arn  = module.compute.web_api_function_arn
@@ -101,6 +100,10 @@ module "ingress" {
   
   # Handover parameter consumed out of your Security/WAF module
   cloudfront_waf_arn    = module.security.cloudfront_waf_arn
+
+  # Handover parameters consumed out of your Storage module
+  static_bucket_regional_domain_name = module.storage.static_assets_bucket_regional_domain_name
+  static_bucket_arn                 = module.storage.static_assets_bucket_arn
 
   # Explicit multi-region mapping authorization
   providers = {
