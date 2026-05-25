@@ -2,17 +2,17 @@
 #       INGRESS COMPONENTS FOR HANDLING EXTERNAL TRAFFIC: ROUTE 53, CLOUDFRONT & API GATEWAY  
 # ============================================================================================
 
-# 1. ROUTE 53 AUTOMATED HOSTED ZONE DISCOVERY
+# 1. ROUTE 53 AUTOMATED HOSTED ZONE DISCOVERY (Fetches asgardcuisines.link)
 data "aws_route53_zone" "primary" {
   name         = var.domain_name
   private_zone = false
 }
 
 
-# 2. AWS CERTIFICATE MANAGER (Scoped to us-east-1 for Global Edge Acceptance)
+# 2. AWS CERTIFICATE MANAGER (Scoped to the Apex Domain: asgardcuisines.link)
 resource "aws_acm_certificate" "api_cert" {
   provider          = aws.us_east_1 
-  domain_name       = var.subdomain_name
+  domain_name       = var.domain_name 
   validation_method = "DNS"
 
   tags = {
@@ -114,15 +114,27 @@ resource "aws_lambda_permission" "gateway_invoke_clearance" {
 }
 
 
-# 4. AMAZON CLOUDFRONT EDGE ROUTING DISTRIBUTION (Unified Frontend Perimeter Edge)
+# 4. CLOUDFRONT EDGE ROUTER (For Dual Origins & Path Routing)
+
+# Origin Access Control (OAC) to securely allow CloudFront to read from your private S3 bucket
+resource "aws_cloudfront_origin_access_control" "s3_oac" {
+  name                              = "asgard-${var.environment}-s3-oac"
+  description                       = "OAC for static assets bucket"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
+}
+
+# CloudFront Distribution with Dual Origins (API Gateway & S3) and Path-Based Routing
 resource "aws_cloudfront_distribution" "api_cdn" {
   enabled         = true
   is_ipv6_enabled = true
   price_class     = "PriceClass_100" 
-  web_acl_id      = var.cloudfront_waf_arn # Binds WAF rate limits at the edge
+  web_acl_id      = var.cloudfront_waf_arn  # Binds WAF rate limits at the edge
 
-  aliases = [var.subdomain_name]
+  aliases = [var.domain_name] # Using the apex domain
 
+  # ORIGIN 1: The Compute Backend (API Gateway)
   origin {
     # Strips out https:// protocol prefixes to expose clean domain routing handles
     domain_name = replace(aws_apigatewayv2_api.http_gateway.api_endpoint, "https://", "")
@@ -136,6 +148,34 @@ resource "aws_cloudfront_distribution" "api_cdn" {
     }
   }
 
+  # ORIGIN 2: The Static Asset Storage (S3 Bucket)
+  origin {
+    domain_name              = var.static_bucket_regional_domain_name
+    origin_id                = "S3StaticBucketOrigin"
+    origin_access_control_id = aws_cloudfront_origin_access_control.s3_oac.id
+  }
+
+  # BEHAVIOR 1: Route /static/* traffic instantly to S3 (Bypasses Lambda)
+  ordered_cache_behavior {
+    path_pattern     = "/static/*"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "S3StaticBucketOrigin"
+    viewer_protocol_policy = "redirect-to-https" # Enforces Segment 1 client security edge (redirects all HTTP traffic to HTTPS)
+
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl     = 0
+    default_ttl = 86400    # Cache for 1 day
+    max_ttl     = 31536000 # Max cache 1 year
+  }
+
+  # DEFAULT BEHAVIOR: Route everything else (API & HTML Pages) to Django
   default_cache_behavior {
     allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods         = ["GET", "HEAD"]
@@ -144,14 +184,13 @@ resource "aws_cloudfront_distribution" "api_cdn" {
 
     forwarded_values {
       query_string = true
-      headers      = ["*"] # Prevents stripping dynamic Auth/CORS headers down-stream
+      headers      = ["*"] 
 
       cookies {
         forward = "all"
       }
     }
 
-    # API Caching Disabled: Guarantees active dynamic communication routing directly to Django
     min_ttl     = 0
     default_ttl = 0
     max_ttl     = 0
@@ -163,7 +202,6 @@ resource "aws_cloudfront_distribution" "api_cdn" {
     }
   }
 
-  # Custom ACM Certificate for Clean TLS Termination at the Edge (Scoped to us-east-1 for Global Edge Acceptance)
   viewer_certificate {
     acm_certificate_arn      = aws_acm_certificate_validation.api_cert_verify.certificate_arn
     ssl_support_method       = "sni-only"
@@ -176,11 +214,11 @@ resource "aws_cloudfront_distribution" "api_cdn" {
 }
 
 
-# 5. ROUTE 53 SYSTEM POINTER CANONICAL LINK
+# 5. ROUTE 53 SYSTEM POINTER CANONICAL LINK (Points Apex directly to Edge)
 resource "aws_route53_record" "api_dns_pointer" {
-  name      = var.subdomain_name
-  type      = "A"
-  zone_id   = data.aws_route53_zone.primary.zone_id
+  name            = var.domain_name
+  type            = "A"
+  zone_id         = data.aws_route53_zone.primary.zone_id
   allow_overwrite = true
 
   alias {
@@ -188,4 +226,32 @@ resource "aws_route53_record" "api_dns_pointer" {
     zone_id                = aws_cloudfront_distribution.api_cdn.hosted_zone_id
     evaluate_target_health = false
   }
+}
+
+
+# 6. ORIGIN ACCESS CONTROL (OAC) BUCKET POLICY
+# Placed here to break the Terraform circular dependency between Storage and Ingress
+resource "aws_s3_bucket_policy" "static_assets_oac_policy" {
+  # We use the id passed from the storage module via the root
+  bucket = split(":::", var.static_bucket_arn)[1] 
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AllowCloudFrontServicePrincipalReadOnly"
+        Effect    = "Allow"
+        Principal = {
+          Service = "cloudfront.amazonaws.com"
+        }
+        Action   = "s3:GetObject"
+        Resource = "${var.static_bucket_arn}/*"
+        Condition = {
+          StringEquals = {
+            "AWS:SourceArn" = aws_cloudfront_distribution.api_cdn.arn
+          }
+        }
+      }
+    ]
+  })
 }

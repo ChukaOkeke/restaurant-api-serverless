@@ -7,8 +7,3 @@ output "api_gateway_regional_endpoint" {
   value       = aws_apigatewayv2_api.http_gateway.api_endpoint
   description = "The raw regional URL generated natively by AWS API Gateway."
 }
-
-output "production_public_url" {
-  value       = "https://${var.subdomain_name}"
-  description = "The fully secure, firewalled, custom edge vanity domain URL."
-}

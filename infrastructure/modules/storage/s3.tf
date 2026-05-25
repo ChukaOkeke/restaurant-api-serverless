@@ -85,3 +85,29 @@ resource "aws_s3_object" "lambda_bootstrap_artifact" {
     ignore_changes = [source, etag] # Ensures CI/CD overrides don't get wiped by future terraform runs!
   }
 }
+
+
+# =========================================================================
+#       STATIC ASSETS BUCKET (FRONTEND & DJANGO STATIC FILES)
+# =========================================================================
+
+# 1. THE S3 BUCKET CONTAINER
+resource "aws_s3_bucket" "static_assets" {
+  bucket        = "asgard-${var.environment}-static-assets-${random_id.bucket_suffix.hex}"
+  force_destroy = var.environment == "production" ? false : true 
+
+  tags = {
+    Name = "asgard-${var.environment}-static-assets"
+  }
+}
+
+# 2. PUBLIC ACCESS BLOCKER (Enforces absolute Zero-Trust perimeter isolation)
+# Note: CloudFront uses Origin Access Control (OAC) to securely bypass this block.
+resource "aws_s3_bucket_public_access_block" "static_assets_privacy" {
+  bucket = aws_s3_bucket.static_assets.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
