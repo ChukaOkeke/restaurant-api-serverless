@@ -116,7 +116,7 @@ resource "aws_lambda_function" "web_api" {
 
   # Runtime Specs
   runtime     = "python3.11"
-  handler     = "asgard.asgi.handler" # Routed cleanly via Mangum adapter in code
+  handler     = "handler.handler" # The variable/function in application code to execute to route cleanly via Mangum adapter in code (Entry point for API Gateway triggered processing)
   timeout     = 30
   memory_size = 512 # Standard minimum baseline processing ceiling for standard Django packages
 
@@ -149,7 +149,7 @@ resource "aws_lambda_function" "queue_worker" {
   s3_key    = var.s3_bootstrap_key
 
   runtime     = "python3.11"
-  handler     = "workers.booking_worker.handler" 
+  handler     = "worker.handler" # The variable/function in application code to execute (Entry point for SQS-triggered processing)
   timeout     = 60 # Extended lifecycle limit for handling batch processing retries
   memory_size = 512
 
