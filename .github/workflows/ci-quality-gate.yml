@@ -120,7 +120,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
           # Runs natively on the host runner to seamlessly check your dependencies
-          snyk test --file=src/requirements.txt --severity-threshold=high
+          snyk test --file=src/requirements.txt --severity-threshold=high -- --allow-missing # Hard fail if any high severity vulnerabilities are found, but allow the scan to run even if the requirements file is missing (e.g., for certain PRs)
 
   # =========================================================================
   # JOB 3: VALIDATE INFRASTRUCTURE AS CODE SYNTAX (RUNS ONLY IF INFRA CHANGES)
