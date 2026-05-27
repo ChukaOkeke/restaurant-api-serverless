@@ -116,10 +116,11 @@ jobs:
         uses: snyk/actions/setup@master # Use the native CLI tool
 
       - name: "Execute Dependency Supply-Chain SCA Scan (Snyk)"
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
-          # Runs natively on the host runner to seamlessly check your dependencies
+          # 1. Explicitly force the native CLI to authenticate using your GitHub Secret
+          snyk auth ${{ secrets.SNYK_TOKEN }}
+          
+          # 2. Run the security perimeter scan
           snyk test --file=src/requirements.txt --severity-threshold=high -- --allow-missing # Hard fail if any high severity vulnerabilities are found, but allow the scan to run even if the requirements file is missing (e.g., for certain PRs)
 
   # =========================================================================
