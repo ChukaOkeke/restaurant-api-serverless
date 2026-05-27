@@ -80,7 +80,7 @@ resource "aws_iam_policy" "lambda_permissions" {
         ]
         # Scoped to all identities since SES requires you to verify individual 
         # domains/emails inside the service itself before you can send from them.
-        Resource = "*" 
+        Resource = "*"
       }
     ]
   })
@@ -150,7 +150,7 @@ resource "aws_lambda_function" "queue_worker" {
 
   runtime     = "python3.11"
   handler     = "worker.handler" # The variable/function in application code to execute (Entry point for SQS-triggered processing)
-  timeout     = 60 # Extended lifecycle limit for handling batch processing retries
+  timeout     = 60               # Extended lifecycle limit for handling batch processing retries
   memory_size = 512
 
   vpc_config {
@@ -174,10 +174,10 @@ resource "aws_lambda_function" "queue_worker" {
 resource "aws_lambda_event_source_mapping" "sqs_to_worker" {
   event_source_arn = var.sqs_queue_arn
   function_name    = aws_lambda_function.queue_worker.arn
-  
+
   # Accumulates up to 10 payloads or waits 5 seconds before waking up the Lambda execution layer
-  batch_size                         = 10   
-  maximum_batching_window_in_seconds = 5    
-  
+  batch_size                         = 10
+  maximum_batching_window_in_seconds = 5
+
   enabled = true
 }
