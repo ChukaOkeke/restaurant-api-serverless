@@ -5,6 +5,7 @@
 # 1. THE DEAD LETTER QUEUE (Captures Failed Messages)
 resource "aws_sqs_queue" "booking_dlq" {
   name                      = "asgard-${var.environment}-booking-dlq"
+  kms_master_key_id         = "alias/aws/sqs" # Enables native encryption at rest
   message_retention_seconds = var.dlq_retention_seconds
 
   tags = {
@@ -18,7 +19,7 @@ resource "aws_sqs_queue" "booking_queue" {
   delay_seconds             = var.queue_delay_seconds
   max_message_size          = var.max_message_size
   message_retention_seconds = var.queue_retention_seconds
-
+  kms_master_key_id         = "alias/aws/sqs" # Enables native encryption at rest
   # The visibility timeout MUST be greater than or equal to your processing 
   # Lambda's execution timeout to prevent dual-processing races.
   visibility_timeout_seconds = var.visibility_timeout_seconds

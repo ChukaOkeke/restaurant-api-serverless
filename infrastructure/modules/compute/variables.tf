@@ -46,3 +46,13 @@ variable "app_secrets_arn" {
   type        = string
   description = "The Secrets Manager secret ARN holding application specific variables"
 }
+
+variable "sqs_dlq_arn" {
+  type        = string
+  description = "The ARN of the SQS booking dead letter queue for failed Lambda executions"
+}
+
+variable "aws_region" {
+  type        = string
+  description = "The AWS region where the resources will be deployed"
+}

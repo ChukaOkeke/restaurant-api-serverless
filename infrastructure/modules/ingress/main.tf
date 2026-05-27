@@ -2,14 +2,7 @@
 #       INGRESS COMPONENTS FOR HANDLING EXTERNAL TRAFFIC: ROUTE 53, CLOUDFRONT & API GATEWAY  
 # ============================================================================================
 
-# 1. ROUTE 53 AUTOMATED HOSTED ZONE DISCOVERY (Fetches asgardcuisines.link)
-data "aws_route53_zone" "primary" {
-  name         = var.domain_name
-  private_zone = false
-}
-
-
-# 2. AWS CERTIFICATE MANAGER (Scoped to the Apex Domain: asgardcuisines.link)
+# 1. AWS CERTIFICATE MANAGER (Scoped to the Apex Domain: asgardcuisines.link)
 resource "aws_acm_certificate" "api_cert" {
   provider          = aws.us_east_1
   domain_name       = var.domain_name
@@ -50,7 +43,7 @@ resource "aws_acm_certificate_validation" "api_cert_verify" {
 }
 
 
-# 3. AMAZON API GATEWAY (Low-Latency Native HTTP V2 Regional Core Engine)
+# 2. AMAZON API GATEWAY (Low-Latency Native HTTP V2 Regional Core Engine)
 resource "aws_apigatewayv2_api" "http_gateway" {
   name          = "asgard-${var.environment}-http-gateway"
   protocol_type = "HTTP"
@@ -114,7 +107,7 @@ resource "aws_lambda_permission" "gateway_invoke_clearance" {
 }
 
 
-# 4. CLOUDFRONT EDGE ROUTER (For Dual Origins & Path Routing)
+# 3. CLOUDFRONT EDGE ROUTER (For Dual Origins & Path Routing)
 
 # Origin Access Control (OAC) to securely allow CloudFront to read from your private S3 bucket
 resource "aws_cloudfront_origin_access_control" "s3_oac" {
@@ -214,7 +207,7 @@ resource "aws_cloudfront_distribution" "api_cdn" {
 }
 
 
-# 5. ROUTE 53 SYSTEM POINTER CANONICAL LINK (Points Apex directly to Edge)
+# 4. ROUTE 53 SYSTEM POINTER CANONICAL LINK (Points Apex directly to Edge)
 resource "aws_route53_record" "api_dns_pointer" {
   name            = var.domain_name
   type            = "A"
@@ -229,7 +222,7 @@ resource "aws_route53_record" "api_dns_pointer" {
 }
 
 
-# 6. ORIGIN ACCESS CONTROL (OAC) BUCKET POLICY
+# 5. ORIGIN ACCESS CONTROL (OAC) BUCKET POLICY
 # Placed here to break the Terraform circular dependency between Storage and Ingress
 resource "aws_s3_bucket_policy" "static_assets_oac_policy" {
   # We use the id passed from the storage module via the root

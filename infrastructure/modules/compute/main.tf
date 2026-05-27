@@ -132,7 +132,17 @@ resource "aws_lambda_function" "web_api" {
       APP_SECRETS_ARN     = var.app_secrets_arn
       DATABASE_SECRET_ARN = var.rds_secret_arn
       SQS_QUEUE_URL       = var.sqs_queue_id
+      DEBUG               = "False"
+      CI_MODE             = "True"
     }
+  }
+
+  # Secure environment variable storage via native AWS managed KMS key
+  kms_key_arn = "arn:aws:kms:${var.aws_region}:${data.aws_caller_identity.current.account_id}:alias/aws/lambda"
+
+  # Route execution failures directly to our SQS DLQ
+  dead_letter_config {
+    target_arn = var.sqs_dlq_arn
   }
 
   depends_on = [aws_cloudwatch_log_group.api_logs]

@@ -58,6 +58,17 @@ resource "aws_s3_bucket_lifecycle_configuration" "lambda_artifacts_lifecycle" {
   }
 }
 
+# 6. ENFORCE SERVER-SIDE ENCRYPTION
+# Using the AWS managed S3 key (AES256) satisfies the baseline standard cleanly.
+resource "aws_s3_bucket_server_side_encryption_configuration" "lambda_artifacts_encryption" {
+  bucket = aws_s3_bucket.lambda_artifacts.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
 
 # -----------------------------------------------------------------------------------------
 # INFRASTRUCTURE BOOTSTRAP LOGIC (Prevents Lambda function first-run compilation failures)
@@ -110,4 +121,47 @@ resource "aws_s3_bucket_public_access_block" "static_assets_privacy" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+# 3. ENABLE VERSIONING (Allows clean point-in-time rollbacks if a static asset deployment breaks the frontend)
+resource "aws_s3_bucket_versioning" "static_assets_versioning" {
+  bucket = aws_s3_bucket.static_assets.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# 4. ENFORCE SERVER-SIDE ENCRYPTION
+# Using the AWS managed S3 key (AES256) satisfies the baseline standard cleanly.
+resource "aws_s3_bucket_server_side_encryption_configuration" "static_assets_encryption" {
+  bucket = aws_s3_bucket.static_assets.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+# 5. FINOPS LIFECYCLE CONFIGURATION (Automated Storage Cost Mitigation)
+resource "aws_s3_bucket_lifecycle_configuration" "static_assets_lifecycle" {
+  bucket = aws_s3_bucket.static_assets.id
+
+  rule {
+    id     = "cleanup_historical_deployments_and_ghost_costs"
+    status = "Enabled"
+
+    # Optimization 1: Clean up incomplete multipart uploads after 7 days.
+    # Prevents "ghost storage" fees if a CI/CD network blip breaks an upload halfway through.
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+
+    # Optimization 2: Zero-Trust Rollback Retention Policy
+    # Keep the active version forever, but clean up older deployment history.
+    noncurrent_version_expiration {
+      noncurrent_days           = 30 # Delete old versions once they've been inactive for 30 days
+      newer_noncurrent_versions = 3  # CRITICAL: Always keep the last 3 historical versions for emergency rollbacks!
+    }
+  }
 }
