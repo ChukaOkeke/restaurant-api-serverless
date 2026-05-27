@@ -112,16 +112,24 @@ jobs:
           # Scans recursively, reporting medium/high severity concerns while skipping test directories
           bandit -r src/ -ll -ii -v
 
-      - name: "Setup Native Snyk CLI Engine"
-        uses: snyk/actions/setup@master # Use the native CLI tool
+      # - name: "Setup Native Snyk CLI Engine"
+      #   uses: snyk/actions/setup@master # Use the native CLI tool
+
+      # - name: "Execute Dependency Supply-Chain SCA Scan (Snyk)"
+      #   run: |
+      #     # 1. Explicitly force the native CLI to authenticate using your GitHub Secret
+      #     snyk auth ${{ secrets.SNYK_TOKEN }}
+          
+      #     # 2. Run the security perimeter scan
+      #     snyk test --file=src/requirements.txt --severity-threshold=high -- --allow-missing # Hard fail if any high severity vulnerabilities are found, but allow the scan to run even if the requirements file is missing (e.g., for certain PRs)
 
       - name: "Execute Dependency Supply-Chain SCA Scan (Snyk)"
-        run: |
-          # 1. Explicitly force the native CLI to authenticate using your GitHub Secret
-          snyk auth ${{ secrets.SNYK_TOKEN }}
-          
-          # 2. Run the security perimeter scan
-          snyk test --file=src/requirements.txt --severity-threshold=high -- --allow-missing # Hard fail if any high severity vulnerabilities are found, but allow the scan to run even if the requirements file is missing (e.g., for certain PRs)
+        uses: snyk/actions/python@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
+          args: --file=src/requirements.txt --severity-threshold=high -- --allow-missing # Hard fail if any high severity vulnerabilities are found, but allow the scan to run even if the requirements file is missing (e.g., for certain PRs)
 
   # =========================================================================
   # JOB 3: VALIDATE INFRASTRUCTURE AS CODE SYNTAX (RUNS ONLY IF INFRA CHANGES)
