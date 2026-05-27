@@ -22,7 +22,7 @@ provider "aws" {
 
 # Global Edge Provider (For CloudFront WAF & ACM Certificate compliance)
 provider "aws" {
-  alias  = "us_east_1"
-  region = var.aws_cloudfront_compliance_region
+  alias   = "us_east_1"
+  region  = var.aws_cloudfront_compliance_region
   profile = var.aws_cloudfront_compliance_profile # Specify the AWS CLI profile
 }

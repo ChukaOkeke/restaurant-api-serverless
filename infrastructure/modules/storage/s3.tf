@@ -94,7 +94,7 @@ resource "aws_s3_object" "lambda_bootstrap_artifact" {
 # 1. THE S3 BUCKET CONTAINER
 resource "aws_s3_bucket" "static_assets" {
   bucket        = "asgard-${var.environment}-static-assets-${random_id.bucket_suffix.hex}"
-  force_destroy = var.environment == "production" ? false : true 
+  force_destroy = var.environment == "production" ? false : true
 
   tags = {
     Name = "asgard-${var.environment}-static-assets"

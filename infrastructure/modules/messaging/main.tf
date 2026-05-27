@@ -18,7 +18,7 @@ resource "aws_sqs_queue" "booking_queue" {
   delay_seconds             = var.queue_delay_seconds
   max_message_size          = var.max_message_size
   message_retention_seconds = var.queue_retention_seconds
-  
+
   # The visibility timeout MUST be greater than or equal to your processing 
   # Lambda's execution timeout to prevent dual-processing races.
   visibility_timeout_seconds = var.visibility_timeout_seconds

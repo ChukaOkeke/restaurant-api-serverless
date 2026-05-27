@@ -18,8 +18,8 @@ module "vpc" {
 module "database" {
   source = "./modules/database"
 
-  environment        = var.environment
-  
+  environment = var.environment
+
   # Passing the outputs from the VPC module straight into the Database module.
   vpc_id             = module.vpc.vpc_id
   private_subnet_ids = module.vpc.private_subnet_ids
@@ -91,19 +91,19 @@ module "compute" {
 module "ingress" {
   source = "./modules/ingress"
 
-  environment           = var.environment
-  domain_name           = var.domain_name
-  
+  environment = var.environment
+  domain_name = var.domain_name
+
   # Handover parameters consumed out of your Compute module
   web_api_function_arn  = module.compute.web_api_function_arn
   web_api_function_name = module.compute.web_api_function_name
-  
+
   # Handover parameter consumed out of your Security/WAF module
-  cloudfront_waf_arn    = module.security.cloudfront_waf_arn
+  cloudfront_waf_arn = module.security.cloudfront_waf_arn
 
   # Handover parameters consumed out of your Storage module
   static_bucket_regional_domain_name = module.storage.static_assets_bucket_regional_domain_name
-  static_bucket_arn                 = module.storage.static_assets_bucket_arn
+  static_bucket_arn                  = module.storage.static_assets_bucket_arn
 
   # Explicit multi-region mapping authorization
   providers = {

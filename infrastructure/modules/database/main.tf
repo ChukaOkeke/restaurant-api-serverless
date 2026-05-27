@@ -21,9 +21,9 @@ resource "aws_rds_cluster" "aurora_cluster" {
 
   database_name   = "asgard_cuisines_db"
   master_username = "dbadmin"
-  
+
   # Best Practice: AWS automatically manages, rotates, and stores the password in Secrets Manager
-  manage_master_user_password = true 
+  manage_master_user_password = true
 
   db_subnet_group_name   = aws_db_subnet_group.aurora_subnets.name
   vpc_security_group_ids = [var.database_sg_id]
@@ -48,10 +48,10 @@ resource "aws_rds_cluster_instance" "aurora_instance" {
   cluster_identifier = aws_rds_cluster.aurora_cluster.id
   engine             = aws_rds_cluster.aurora_cluster.engine
   engine_version     = aws_rds_cluster.aurora_cluster.engine_version
-  
+
   # CRITICAL: This exact instance class tells AWS to use the Serverless v2 scaling config
-  instance_class     = "db.serverless" 
-  
+  instance_class = "db.serverless"
+
   db_subnet_group_name = aws_db_subnet_group.aurora_subnets.name
 
   tags = {

@@ -11,8 +11,8 @@ data "aws_route53_zone" "primary" {
 
 # 2. AWS CERTIFICATE MANAGER (Scoped to the Apex Domain: asgardcuisines.link)
 resource "aws_acm_certificate" "api_cert" {
-  provider          = aws.us_east_1 
-  domain_name       = var.domain_name 
+  provider          = aws.us_east_1
+  domain_name       = var.domain_name
   validation_method = "DNS"
 
   tags = {
@@ -75,7 +75,7 @@ resource "aws_apigatewayv2_stage" "default_stage" {
 
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.gateway_logs.arn
-    format          = jsonencode({
+    format = jsonencode({
       requestId      = "$context.requestId"
       ip             = "$context.identity.sourceIp"
       requestTime    = "$context.requestTime"
@@ -94,7 +94,7 @@ resource "aws_apigatewayv2_integration" "lambda_link" {
   integration_type       = "AWS_PROXY"
   integration_uri        = var.web_api_function_arn
   integration_method     = "POST"
-  payload_format_version = "2.0" 
+  payload_format_version = "2.0"
 }
 
 # Catch-All Gateway Routing Strategy
@@ -129,8 +129,8 @@ resource "aws_cloudfront_origin_access_control" "s3_oac" {
 resource "aws_cloudfront_distribution" "api_cdn" {
   enabled         = true
   is_ipv6_enabled = true
-  price_class     = "PriceClass_100" 
-  web_acl_id      = var.cloudfront_waf_arn  # Binds WAF rate limits at the edge
+  price_class     = "PriceClass_100"
+  web_acl_id      = var.cloudfront_waf_arn # Binds WAF rate limits at the edge
 
   aliases = [var.domain_name] # Using the apex domain
 
@@ -157,10 +157,10 @@ resource "aws_cloudfront_distribution" "api_cdn" {
 
   # BEHAVIOR 1: Route /static/* traffic instantly to S3 (Bypasses Lambda)
   ordered_cache_behavior {
-    path_pattern     = "/static/*"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3StaticBucketOrigin"
+    path_pattern           = "/static/*"
+    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
+    cached_methods         = ["GET", "HEAD"]
+    target_origin_id       = "S3StaticBucketOrigin"
     viewer_protocol_policy = "redirect-to-https" # Enforces Segment 1 client security edge (redirects all HTTP traffic to HTTPS)
 
     forwarded_values {
@@ -184,7 +184,7 @@ resource "aws_cloudfront_distribution" "api_cdn" {
 
     forwarded_values {
       query_string = true
-      headers      = ["*"] 
+      headers      = ["*"]
 
       cookies {
         forward = "all"
@@ -233,14 +233,14 @@ resource "aws_route53_record" "api_dns_pointer" {
 # Placed here to break the Terraform circular dependency between Storage and Ingress
 resource "aws_s3_bucket_policy" "static_assets_oac_policy" {
   # We use the id passed from the storage module via the root
-  bucket = split(":::", var.static_bucket_arn)[1] 
+  bucket = split(":::", var.static_bucket_arn)[1]
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Sid       = "AllowCloudFrontServicePrincipalReadOnly"
-        Effect    = "Allow"
+        Sid    = "AllowCloudFrontServicePrincipalReadOnly"
+        Effect = "Allow"
         Principal = {
           Service = "cloudfront.amazonaws.com"
         }

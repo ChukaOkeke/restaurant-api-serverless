@@ -20,7 +20,7 @@ resource "aws_secretsmanager_secret_version" "app_secrets_template" {
     DJANGO_SECRET_KEY = "placeholder-to-be-rotated-manually-via-aws-console"
     DEBUG             = "False"
   })
-  
+
   # Prevents Terraform from overwriting real production values on subsequent runs
   lifecycle {
     ignore_changes = [secret_string]
