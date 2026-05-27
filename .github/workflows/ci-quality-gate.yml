@@ -112,13 +112,15 @@ jobs:
           # Scans recursively, reporting medium/high severity concerns while skipping test directories
           bandit -r src/ -ll -ii -v
 
+      - name: "Setup Native Snyk CLI Engine"
+        uses: snyk/actions/setup@master # Use the native CLI tool
+
       - name: "Execute Dependency Supply-Chain SCA Scan (Snyk)"
-        uses: snyk/actions/python@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: test
-          args: --file=src/requirements.txt --severity-threshold=high
+        run: |
+          # Runs natively on the host runner to seamlessly check your dependencies
+          snyk test --file=src/requirements.txt --severity-threshold=high
 
   # =========================================================================
   # JOB 3: VALIDATE INFRASTRUCTURE AS CODE SYNTAX (RUNS ONLY IF INFRA CHANGES)
