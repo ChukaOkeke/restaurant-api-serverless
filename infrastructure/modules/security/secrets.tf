@@ -8,6 +8,8 @@ resource "aws_secretsmanager_secret" "app_secrets" {
   description             = "Secure container for Django runtime environment variables and API keys."
   recovery_window_in_days = 7 # FinOps safety: short window allows faster recreation testing if wiped
 
+  # checkov:skip=CKV_AWS_149:KMS encryption is bypassed in dev to eliminate custom key costs; default cloud security is sufficient
+
   tags = {
     Name = "asgard-${var.environment}-app-secrets"
   }

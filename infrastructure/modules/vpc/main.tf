@@ -37,6 +37,8 @@ resource "aws_subnet" "public_sn" {
   # Ensures resources dropped here get public IPs if needed down the road
   map_public_ip_on_launch = true
 
+  # checkov:skip=CKV_AWS_130:Public subnets must map public IPs on launch to allow public-facing infrastructure (like NAT Gateways or ALBs) to function. Compute and database nodes remain secured inside private subnets.
+
   tags = {
     Name = "asgard-${var.environment}-public-sn-${each.key}"
     Type = "Public"

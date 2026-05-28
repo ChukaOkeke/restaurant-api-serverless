@@ -22,6 +22,8 @@ resource "aws_iam_role" "lambda_exec" {
 }
 
 # Unified Custom Policy for VPC Execution, Logging, Secrets Access, SQS Processing, and SES Email Dispatch
+# checkov:skip=CKV_AWS_355:Wildcard resource is mandatory for ec2:DescribeNetworkInterfaces to permit VPC Lambda ENI allocation, and intentionally permitted for SES in dev to allow multi-identity sandbox testing.
+# checkov:skip=CKV_AWS_290:Wildcard resource is mandatory for ec2:DescribeNetworkInterfaces to permit VPC Lambda ENI allocation, and intentionally permitted for SES in dev to allow multi-identity sandbox testing.
 resource "aws_iam_policy" "lambda_permissions" {
   name        = "asgard-${var.environment}-lambda-permissions-policy"
   description = "IAM policy granting network boundary routing, logging, queue handling, credential decoding, and SES mail dispatch"
@@ -171,6 +173,7 @@ resource "aws_lambda_function" "web_api" {
 
   # checkov:skip=CKV_AWS_272:Code signing is bypassed for this environment. Pipeline integrity is maintained via GitHub Actions OIDC identity validation and branch protection rules.
   # checkov:skip=CKV_AWS_173:KMS encryption is bypassed in dev to eliminate custom key costs; default cloud security is sufficient
+  # checkov:skip=CKV_AWS_116:Uses redrive policy with SQS DLQ for handling failed events instead of Lambda Destinations to allow for easier debugging and reprocessing of failed events during development without needing to set up additional infrastructure components.
 
   depends_on = [aws_cloudwatch_log_group.api_logs]
 }
@@ -215,7 +218,7 @@ resource "aws_lambda_function" "queue_worker" {
 
   # checkov:skip=CKV_AWS_272:Code signing is bypassed for this environment. Pipeline integrity is maintained via GitHub Actions OIDC identity validation and branch protection rules.
   # checkov:skip=CKV_AWS_173:KMS encryption is bypassed in dev to eliminate custom key costs; default cloud security is sufficient
-
+  # checkov:skip=CKV_AWS_116:Uses redrive policy with SQS DLQ for handling failed events instead of Lambda Destinations to allow for easier debugging and reprocessing of failed events during development without needing to set up additional infrastructure components.
   depends_on = [aws_cloudwatch_log_group.worker_logs]
 }
 

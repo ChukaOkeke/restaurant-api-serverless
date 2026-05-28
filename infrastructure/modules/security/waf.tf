@@ -41,6 +41,8 @@ resource "aws_wafv2_web_acl" "cloudfront_waf" {
     sampled_requests_enabled   = true
   }
 
+  # checkov:skip=CKV_AWS_192:Log4j protection is bypassed because the application stack utilizes a pure Python runtime environment, making Java-based Log4jshell exploits zero-risk for this infrastructure.
+
   tags = {
     Name = "asgard-${var.environment}-cloudfront-waf"
   }

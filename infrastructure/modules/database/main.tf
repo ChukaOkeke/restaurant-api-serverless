@@ -67,6 +67,7 @@ resource "aws_rds_cluster_instance" "aurora_instance" {
   # checkov:skip=CKV_AWS_226:Auto minor upgrades are disabled to maintain strict engine version parity across stages and prevent uncoordinated database restarts outside of managed maintenance windows.
   auto_minor_version_upgrade = false # Intentionally disabled for deterministic change control
 
+  # checkov:skip=CKV_AWS_354:KMS encryption is bypassed in dev to eliminate custom key costs; default cloud security is sufficient
   performance_insights_enabled = true # Enables Performance Insights for advanced database performance monitoring and troubleshooting
 
   # checkov:skip=CKV_AWS_118:Enhanced monitoring is disabled in dev to eliminate CloudWatch log ingestion charges and avoid unnecessary IAM monitoring role provisioning; standard baseline CloudWatch metrics are sufficient.
