@@ -122,3 +122,11 @@ variable "domain_name" {
   default     = "asgardcuisines.link" # Replace with your real registered domain name
   description = "Your registered custom base apex domain zone"
 }
+
+
+# COMPUTE CONFIGURATIONS (Lambda Function Settings)
+variable "lambda_concurrency_limit" {
+  type        = string
+  description = "The maximum number of concurrent executions for the web API Lambda function"
+  default     = "10" # Set a safe default to prevent account-wide resource exhaustion during development
+}

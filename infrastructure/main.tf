@@ -64,10 +64,11 @@ module "storage" {
 module "compute" {
   source = "./modules/compute"
 
-  environment        = var.environment
-  private_subnet_ids = module.vpc.private_subnet_ids
-  lambda_sg_id       = module.vpc.lambda_sg_id
-  aws_region         = var.aws_primary_region
+  environment              = var.environment
+  private_subnet_ids       = module.vpc.private_subnet_ids
+  lambda_sg_id             = module.vpc.lambda_sg_id
+  aws_region               = var.aws_primary_region
+  lambda_concurrency_limit = var.lambda_concurrency_limit
 
   # Storage references
   s3_bucket_id     = module.storage.bucket_name
