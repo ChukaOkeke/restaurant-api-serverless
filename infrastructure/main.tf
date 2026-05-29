@@ -60,7 +60,7 @@ module "storage" {
   environment = var.environment
 }
 
-# Create Lambda Serverless Infrastructure for both the Web API and the Asynchronous Queue Worker
+# Create Lambda Serverless Infrastructure for both the Web API and the Asynchronous Queue Worker.
 module "compute" {
   source = "./modules/compute"
 
