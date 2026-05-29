@@ -21,3 +21,8 @@ output "github_actions_deployment_role_arn" {
   value       = module.security.github_actions_role_arn
   description = "Inject this ARN straight into your github workflow configurations."
 }
+
+output "bucket_name" {
+  value       = module.storage.bucket_name # Adjust path based on your module structure
+  description = "The S3 bucket name for CI/CD uploads"
+}
