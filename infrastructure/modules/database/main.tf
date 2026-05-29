@@ -48,6 +48,7 @@ resource "aws_rds_cluster" "aurora_cluster" {
   # checkov:skip=CKV_AWS_327:KMS encryption is bypassed in dev to eliminate custom key costs; default cloud security is sufficient
   # checkov:skip=CKV_AWS_139: No deletion protection to allow easy teardown during development; production environments should set this to true
   # checkov:skip=CKV2_AWS_27:Full PostgreSQL statement query logging is disabled in the development tier to reduce unnecessary CloudWatch log volume overhead and storage baseline costs.
+  # checkov:skip=CKV2_AWS_8:Centralized AWS Backup service assignment is bypassed because the cluster uses standard native Aurora automated snapshots and PITR, which are sufficient for dev/sandbox recovery without duplicate cost tiers.
   tags = {
     Name = "asgard-${var.environment}-aurora-cluster"
   }

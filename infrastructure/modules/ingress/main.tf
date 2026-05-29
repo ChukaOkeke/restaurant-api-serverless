@@ -180,6 +180,8 @@ resource "aws_cloudfront_distribution" "api_cdn" {
     target_origin_id       = "APIGatewayOrigin"
     viewer_protocol_policy = "redirect-to-https" # Enforces Segment 1 client security edge (redirects all HTTP traffic to HTTPS)
 
+    response_headers_policy_id = data.aws_cloudfront_response_headers_policy.security_headers.id # Inject secure edge headers via AWS Managed Policy
+
     forwarded_values {
       query_string = true
       headers      = ["*"]
