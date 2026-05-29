@@ -8,6 +8,8 @@ resource "aws_sqs_queue" "booking_dlq" {
   kms_master_key_id         = "alias/aws/sqs" # Enables native encryption at rest
   message_retention_seconds = var.dlq_retention_seconds
 
+  # checkov:skip=CKV2_AWS_73:KMS encryption is bypassed in dev to eliminate custom key costs; default cloud security is sufficient
+
   tags = {
     Name = "asgard-${var.environment}-booking-dlq"
   }
@@ -29,6 +31,8 @@ resource "aws_sqs_queue" "booking_queue" {
     deadLetterTargetArn = aws_sqs_queue.booking_dlq.arn
     maxReceiveCount     = var.max_receive_count # Max retries before dropping to DLQ
   })
+
+  # checkov:skip=CKV2_AWS_73:KMS encryption is bypassed in dev to eliminate custom key costs; default cloud security is sufficient
 
   tags = {
     Name = "asgard-${var.environment}-booking-queue"

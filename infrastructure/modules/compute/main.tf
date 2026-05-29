@@ -22,8 +22,7 @@ resource "aws_iam_role" "lambda_exec" {
 }
 
 # Unified Custom Policy for VPC Execution, Logging, Secrets Access, SQS Processing, and SES Email Dispatch
-# checkov:skip=CKV_AWS_355:Wildcard resource is mandatory for ec2:DescribeNetworkInterfaces to permit VPC Lambda ENI allocation, and intentionally permitted for SES in dev to allow multi-identity sandbox testing.
-# checkov:skip=CKV_AWS_290:Wildcard resource is mandatory for ec2:DescribeNetworkInterfaces to permit VPC Lambda ENI allocation, and intentionally permitted for SES in dev to allow multi-identity sandbox testing.
+
 resource "aws_iam_policy" "lambda_permissions" {
   name        = "asgard-${var.environment}-lambda-permissions-policy"
   description = "IAM policy granting network boundary routing, logging, queue handling, credential decoding, and SES mail dispatch"
@@ -94,6 +93,9 @@ resource "aws_iam_policy" "lambda_permissions" {
       }
     ]
   })
+
+  # checkov:skip=CKV_AWS_355:Wildcard resource is mandatory for ec2:DescribeNetworkInterfaces to permit VPC Lambda ENI allocation, and intentionally permitted for SES in dev to allow multi-identity sandbox testing.
+  # checkov:skip=CKV_AWS_290:Wildcard resource is mandatory for ec2:DescribeNetworkInterfaces to permit VPC Lambda ENI allocation, and intentionally permitted for SES in dev to allow multi-identity sandbox testing.
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_policy_link" {

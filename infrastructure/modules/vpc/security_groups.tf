@@ -12,6 +12,8 @@ resource "aws_security_group" "lambda" {
   description = "Security group for private backend Lambda functions"
   vpc_id      = aws_vpc.asgard_vpc.id
 
+  # checkov:skip=CKV2_AWS_5:Security group uses decoupled standalone rules to avoid cyclical dependencies.
+
   tags = {
     Name = "asgard-${var.environment}-lambda-sg"
   }
@@ -23,6 +25,8 @@ resource "aws_security_group" "vpc_endpoints" {
   description = "Security group for shared VPC Interface Endpoints"
   vpc_id      = aws_vpc.asgard_vpc.id
 
+  # checkov:skip=CKV2_AWS_5:Security group uses decoupled standalone rules to avoid cyclical dependencies.
+
   tags = {
     Name = "asgard-${var.environment}-endpoints-sg"
   }
@@ -33,6 +37,8 @@ resource "aws_security_group" "database" {
   name        = "asgard-${var.environment}-database-sg"
   description = "Security group for Aurora Serverless v2 Cluster"
   vpc_id      = aws_vpc.asgard_vpc.id
+
+  # checkov:skip=CKV2_AWS_5:Security group uses decoupled standalone rules to avoid cyclical dependencies.
 
   tags = {
     Name = "asgard-${var.environment}-database-sg"
@@ -55,6 +61,7 @@ resource "aws_security_group" "bastion" {
   }
 
   # checkov:skip=CKV_AWS_382:Full egress is intentionally allowed from the bastion host to enable necessary management operations, including patching, updates, and secure outbound connections for administrative tasks. Access to the bastion is tightly controlled via ingress rules and IAM policies, ensuring that only authorized personnel can utilize this access point.
+  # checkov:skip=CKV2_AWS_5:Security group uwill be used for a potential bastion host.
   tags = {
     Name = "asgard-${var.environment}-bastion-sg"
   }
@@ -103,4 +110,17 @@ resource "aws_vpc_security_group_ingress_rule" "database_from_lambda" {
   to_port                      = var.db_port
   ip_protocol                  = "tcp"
   referenced_security_group_id = aws_security_group.lambda.id
+}
+
+
+# -------------------------------------------------------------------------
+#  VPC DEFAULT SECURITY GROUP 
+# -------------------------------------------------------------------------
+resource "aws_default_security_group" "default" {
+  vpc_id = aws_vpc.asgard_vpc.id
+
+  # Stripped of all default rules to ensure zero-trust isolation by default
+  tags = {
+    Name = "asgard-${var.environment}-default-sg"
+  }
 }

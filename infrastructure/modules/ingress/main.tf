@@ -211,6 +211,7 @@ resource "aws_cloudfront_distribution" "api_cdn" {
   # checkov:skip=CKV_AWS_310:Multi-region origin failover is disabled in dev to avoid multi-region infrastructure costs; native single-region Multi-AZ tier availability is sufficient.
   # checkov:skip=CKV_AWS_86:CloudFront edge access logging is bypassed to eliminate S3 log storage costs; incoming traffic tracking is already handled via API Gateway CloudWatch logs.
   # checkov:skip=CKV_AWS_305:Default root object is bypassed because this distribution acts as an API proxy; forcing a static index.html disrupts application-level REST API root route resolution.
+  # checkov:skip=CKV2_AWS_47:Log4j mitigation rules are bypassed because the underlying backend compute tier is exclusively built on Python (Lambda/Django), rendering the stack structurally immune to Java Log4j exploits. Adding this group introduces unnecessary WCU consumption and rule overhead for zero active utility.
 
   tags = {
     Name = "asgard-${var.environment}-api-cdn"
