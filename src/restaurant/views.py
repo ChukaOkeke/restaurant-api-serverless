@@ -6,7 +6,7 @@ from .models import MenuItem, Booking
 from .serializers import MenuSerializer, BookingSerializer
 
 # Create your views here.
-# Function-based view to render the homepage to the client
+# Function-based view to render the homepage to the client.
 def index(request):
     return render(request, 'index.html', {})
 
