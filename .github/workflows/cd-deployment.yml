@@ -10,7 +10,6 @@ on:
 env:
   AWS_REGION: "eu-west-1" # Adjust to match your AWS region
   ENVIRONMENT: "dev"      # Adjust based on your target workspace
-  ARTIFACT_BUCKET: "asgard-dev-lambda-artifacts-1996" # Adjust to your exact S3 bucket name
 
 # CRITICAL: These permissions are strictly required for OIDC federation to work
 permissions:
@@ -30,7 +29,6 @@ jobs:
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          # Your AWS Account ID should be safely stored in GitHub Secrets
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/asgard-${{ env.ENVIRONMENT }}-github-actions-role
           aws-region: ${{ env.AWS_REGION }}
 
@@ -40,50 +38,59 @@ jobs:
         with:
           directory: ./infrastructure
           framework: terraform
-          # Soft fail is temporarily ON so we can troubleshoot Terraform without Checkov blocking the pipeline.
-          # We will flip this to 'false' once the infrastructure is 100% stable.
           soft_fail: true 
 
-      # STEP 3: Build & Package Artifacts
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10' # Adjust to match your Django version
-
-      - name: Build and Upload Lambda Deployment Package
-        run: |
-          echo "Packaging Django application and dependencies..."
-          mkdir -p deployment_package
-          
-          # Install vendor dependencies directly into the package folder
-          pip install -r src/requirements.txt -t deployment_package/
-          
-          # Copy application source code into the package folder
-          cp -r src/* deployment_package/
-          
-          # Zip the payload
-          cd deployment_package
-          zip -r9 ../asgard-api-artifact.zip .
-          cd ..
-          
-          echo "Uploading artifact to S3 bucket..."
-          # We use the GitHub SHA to create a unique, version-controlled artifact object
-          aws s3 cp asgard-api-artifact.zip s3://${{ env.ARTIFACT_BUCKET }}/deployments/asgard-api-artifact-${{ github.sha }}.zip
-
-      # STEP 4: Execute Terraform Apply
+      # STEP 3: Setup Terraform & Initialize
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "1.5.0" # Adjust to match your local version
+          terraform_version: "1.5.0" 
 
       - name: Terraform Init
         working-directory: ./infrastructure
         run: terraform init
 
-      - name: Terraform Apply
+      # STEP 4: PHASE 1 APPLY (Infrastructure Bootstrap)
+      # This builds the S3 bucket and dummy Lambda first, so the upload target exists.
+      - name: Terraform Apply - Phase 1 (Infrastructure)
+        working-directory: ./infrastructure
+        run: terraform apply -auto-approve
+        # We do NOT pass the TF_VAR_api_artifact_key here. 
+        # It safely falls back to the bootstrap zip as per the lambda logic.
+
+      # STEP 5: Build & Package the Application
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Build and Package Django Artifact
+        run: |
+          echo "Packaging Django application and dependencies..."
+          mkdir -p deployment_package
+          
+          pip install -r src/requirements.txt -t deployment_package/
+          cp -r src/* deployment_package/
+          
+          cd deployment_package
+          zip -r9 ../asgard-api-artifact.zip .
+          cd ..
+
+      # STEP 6: Dynamic S3 Upload
+      # We extract the bucket name dynamically from Terraform outputs
+      - name: Upload Artifact to S3
+        working-directory: ./infrastructure
+        run: |
+          echo "Fetching dynamic bucket name from Terraform state..."
+          BUCKET_NAME=$(terraform output -raw bucket_name)
+          
+          echo "Uploading artifact to $BUCKET_NAME..."
+          aws s3 cp ../asgard-api-artifact.zip s3://$BUCKET_NAME/deployments/asgard-api-artifact-${{ github.sha }}.zip
+
+      # STEP 7: PHASE 2 APPLY (Code Injection)
+      # Now that the zip is in S3, we update Lambda to point to it.
+      - name: Terraform Apply - Phase 2 (Application Update)
         working-directory: ./infrastructure
         run: terraform apply -auto-approve
         env:
-          # This dynamically passes the S3 object key to Terraform so your aws_lambda_function 
-          # knows EXACTLY which fresh code payload to pull for this specific deployment.
           TF_VAR_api_artifact_key: "deployments/asgard-api-artifact-${{ github.sha }}.zip"
