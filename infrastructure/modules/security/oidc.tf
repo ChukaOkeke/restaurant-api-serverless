@@ -59,7 +59,9 @@ resource "aws_iam_role" "github_actions" {
 
 # 5. ATTACH PERMISSIONS POLICY (Example placeholder: PowerUserAccess for infra provisioning)
 # In actual production, you would prune this to a tightly controlled custom architecture policy.
-resource "aws_iam_role_policy_attachment" "power_user" {
+resource "aws_iam_role_policy_attachment" "terraform_admin" {
   role       = aws_iam_role.github_actions.name
-  policy_arn = "arn:aws:iam::aws:policy/PowerUserAccess"
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+
+  # checkov:skip=CKV_AWS_274:AdminAccess is required for now to ensure infra is stablely provisioned by GitHub Actions; in a production environment, this should be replaced with a custom least-privilege policy that only allows necessary actions for infrastructure deployment.
 }

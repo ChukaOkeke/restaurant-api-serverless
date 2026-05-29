@@ -2,14 +2,14 @@
 #       SERVERLESS LAMBDA DEPLOYMENT ARTIFACT BUCKET 
 # =========================================================================
 
-# 1. RANDOM SUFFIX GENERATOR (Guarantees global S3 naming uniqueness)
-resource "random_id" "bucket_suffix" {
-  byte_length = 4
-}
+# # 1. RANDOM SUFFIX GENERATOR (Guarantees global S3 naming uniqueness)
+# resource "random_id" "bucket_suffix" {
+#   byte_length = 4
+# }
 
 # 2. THE S3 BUCKET CONTAINER
 resource "aws_s3_bucket" "lambda_artifacts" {
-  bucket        = "asgard-${var.environment}-lambda-artifacts-${random_id.bucket_suffix.hex}"
+  bucket        = "asgard-dev-lambda-artifacts-1996"
   force_destroy = var.environment == "production" ? false : true # Prevent accidental prod wiping
 
   # checkov:skip=CKV2_AWS_62:S3 event notifications are disabled on the artifact bucket because it exclusively stores deployment zip packages with no event-driven downstream consumers.
@@ -111,7 +111,7 @@ resource "aws_s3_object" "lambda_bootstrap_artifact" {
 
 # 1. THE S3 BUCKET CONTAINER
 resource "aws_s3_bucket" "static_assets" {
-  bucket        = "asgard-${var.environment}-static-assets-${random_id.bucket_suffix.hex}"
+  bucket        = "asgard-dev-static-assets-1996"
   force_destroy = var.environment == "production" ? false : true
 
   # checkov:skip=CKV2_AWS_62:S3 event notifications are disabled on the static assets bucket because it exclusively stores deployment zip packages with no event-driven downstream consumers.
