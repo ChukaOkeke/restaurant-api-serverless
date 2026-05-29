@@ -11,6 +11,8 @@ resource "aws_vpc" "asgard_vpc" {
   enable_dns_hostnames = true # Enables the Amazon DNS server (169.254.169.253)
   enable_dns_support   = true # Allows instances to receive public/private DNS names
 
+  # checkov:skip=CKV2_AWS_11:VPC Flow Logs are disabled in this sandbox environment to minimize high-volume CloudWatch log ingestion costs during rapid prototyping cycles.
+
   # The default_tags from the root provider merge with this local block to ensure all resources get consistent tagging, while allowing for module-specific tags as needed
   tags = {
     Name = "asgard-${var.environment}-vpc"
@@ -36,6 +38,8 @@ resource "aws_subnet" "public_sn" {
 
   # Ensures resources dropped here get public IPs if needed down the road
   map_public_ip_on_launch = true
+
+  # checkov:skip=CKV_AWS_130:Public subnets must map public IPs on launch to allow public-facing infrastructure (like NAT Gateways or ALBs) to function. Compute and database nodes remain secured inside private subnets.
 
   tags = {
     Name = "asgard-${var.environment}-public-sn-${each.key}"
