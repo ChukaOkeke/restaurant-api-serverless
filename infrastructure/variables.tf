@@ -30,7 +30,7 @@ variable "aws_cloudfront_compliance_region" {
 variable "environment" {
   description = "Deployment environment name"
   type        = string
-  default     = "production"
+  default     = "dev"
 }
 
 
@@ -129,4 +129,10 @@ variable "lambda_concurrency_limit" {
   type        = string
   description = "The maximum number of concurrent executions for the web API Lambda function"
   default     = "10" # Set a safe default to prevent account-wide resource exhaustion during development
+}
+
+variable "api_artifact_key" {
+  type        = string
+  description = "Dynamic S3 key for the Lambda deployment package, injected via GitHub Actions"
+  default     = ""
 }

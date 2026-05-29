@@ -135,9 +135,9 @@ resource "aws_lambda_function" "web_api" {
   description   = "Monolambda running Django DRF handling all synchronous application API paths"
   role          = aws_iam_role.lambda_exec.arn
 
-  # Points to the pre-staged S3 bootstrap storage location
+  # Points to S3 storage, prioritizing the CI/CD artifact over the bootstrap during deployments, and falling back to the bootstrap for local development runs to ensure a smooth developer experience without needing to set up CI/CD pipelines or S3 buckets.
   s3_bucket = var.s3_bucket_id
-  s3_key    = var.s3_bootstrap_key
+  s3_key    = var.api_artifact_key != "" ? var.api_artifact_key : var.s3_bootstrap_key
 
   # Runtime Specs
   runtime     = "python3.11"
@@ -188,7 +188,7 @@ resource "aws_lambda_function" "queue_worker" {
   role          = aws_iam_role.lambda_exec.arn
 
   s3_bucket = var.s3_bucket_id
-  s3_key    = var.s3_bootstrap_key
+  s3_key    = var.api_artifact_key != "" ? var.api_artifact_key : var.s3_bootstrap_key
 
   runtime     = "python3.11"
   handler     = "worker.handler" # The variable/function in application code to execute (Entry point for SQS-triggered processing)

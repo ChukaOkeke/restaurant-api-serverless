@@ -74,6 +74,8 @@ module "compute" {
   s3_bucket_id     = module.storage.bucket_name
   s3_bootstrap_key = module.storage.bootstrap_object_key
 
+  api_artifact_key = var.api_artifact_key
+
   # Messaging queues references
   sqs_queue_arn = module.messaging.queue_arn
   sqs_queue_id  = module.messaging.queue_id

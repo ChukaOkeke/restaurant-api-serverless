@@ -61,3 +61,8 @@ variable "lambda_concurrency_limit" {
   type        = string
   description = "The maximum number of concurrent executions for the web API Lambda function"
 }
+
+variable "api_artifact_key" {
+  type        = string
+  description = "The S3 object key of the live application deployment zip (passed dynamically via CI/CD)"
+}

@@ -1,9 +1,7 @@
 name: "CI Quality & Security Gate"
 
-# Triggers the pipeline when code is pushed to the main branch or when a pull request is opened against the main branch, but only if changes are made to src/, infrastructure/, or the workflow file itself.
+# Triggers the pipeline when a pull request is opened against the main branch, but only if changes are made to src/, infrastructure/, or the workflow file itself.
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 
