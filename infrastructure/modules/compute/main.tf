@@ -109,6 +109,12 @@ resource "aws_iam_role_policy_attachment" "lambda_xray" {
   policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
 
+# Attach the VPC Access policy to your unified Lambda role so it can create ENIs
+resource "aws_iam_role_policy_attachment" "lambda_vpc_access" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
 
 # 2. LAMBDA LOGS
 resource "aws_cloudwatch_log_group" "api_logs" {
@@ -166,7 +172,7 @@ resource "aws_lambda_function" "web_api" {
       DATABASE_SECRET_ARN = var.rds_secret_arn
       SQS_QUEUE_URL       = var.sqs_queue_id
       DEBUG               = "False"
-      CI_MODE             = "True"
+      CI_MODE             = "False"
       ALLOWED_HOSTS       = "*"
     }
   }
@@ -179,7 +185,10 @@ resource "aws_lambda_function" "web_api" {
   # checkov:skip=CKV_AWS_116:Uses redrive policy with SQS DLQ for handling failed events instead of Lambda Destinations to allow for easier debugging and reprocessing of failed events during development without needing to set up additional infrastructure components.
   # checkov:skip=CKV_AWS_115:Concurrency limit is intentionally not set due to AWS Account Quota safety mechanism
 
-  depends_on = [aws_cloudwatch_log_group.api_logs]
+  depends_on = [
+    aws_cloudwatch_log_group.api_logs,
+    aws_iam_role_policy_attachment.lambda_vpc_access
+  ]
 }
 
 
@@ -216,7 +225,7 @@ resource "aws_lambda_function" "queue_worker" {
       APP_SECRETS_ARN     = var.app_secrets_arn
       DATABASE_SECRET_ARN = var.rds_secret_arn
       DEBUG               = "False"
-      CI_MODE             = "True"
+      CI_MODE             = "False"
     }
   }
 
@@ -224,7 +233,10 @@ resource "aws_lambda_function" "queue_worker" {
   # checkov:skip=CKV_AWS_173:KMS encryption is bypassed in dev to eliminate custom key costs; default cloud security is sufficient
   # checkov:skip=CKV_AWS_116:Uses redrive policy with SQS DLQ for handling failed events instead of Lambda Destinations to allow for easier debugging and reprocessing of failed events during development without needing to set up additional infrastructure components.
   # checkov:skip=CKV_AWS_115:Concurrency limit is intentionally not set due to AWS Account Quota safety mechanism
-  depends_on = [aws_cloudwatch_log_group.worker_logs]
+  depends_on = [
+    aws_cloudwatch_log_group.worker_logs,
+    aws_iam_role_policy_attachment.lambda_vpc_access
+  ]
 }
 
 
