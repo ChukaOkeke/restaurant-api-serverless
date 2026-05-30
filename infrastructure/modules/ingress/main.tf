@@ -184,7 +184,7 @@ resource "aws_cloudfront_distribution" "api_cdn" {
 
     forwarded_values {
       query_string = true
-      
+
       # Explicitly list required headers to ensure the 'Host' header is NOT forwarded.
       # If 'Host' is forwarded, API Gateway will reject the request with a 403 Forbidden.
       headers = [
