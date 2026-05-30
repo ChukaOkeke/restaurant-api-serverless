@@ -87,7 +87,7 @@ variable "queue_retention_seconds" {
 
 variable "visibility_timeout_seconds" {
   type    = number
-  default = 30 # Matches standard default Lambda timeout nicely
+  default = 60 # Matches Worker Lambda timeout nicely
 }
 
 variable "dlq_retention_seconds" {
