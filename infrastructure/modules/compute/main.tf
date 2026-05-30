@@ -152,7 +152,7 @@ resource "aws_lambda_function" "web_api" {
   }
 
   # Restricts this function to a safe maximum, protecting the rest of your AWS account pool from being exhausted during traffic spikes.
-  reserved_concurrent_executions = var.lambda_concurrency_limit
+  # reserved_concurrent_executions = var.lambda_concurrency_limit
 
   # Instructs AWS to capture performance metrics and downstream request traces.
   tracing_config {
@@ -171,7 +171,7 @@ resource "aws_lambda_function" "web_api" {
   }
 
   # Secure environment variable storage via native AWS managed KMS key
-  kms_key_arn = "arn:aws:kms:${var.aws_region}:${data.aws_caller_identity.current.account_id}:alias/aws/lambda"
+ # kms_key_arn = "arn:aws:kms:${var.aws_region}:${data.aws_caller_identity.current.account_id}:alias/aws/lambda"
 
   # checkov:skip=CKV_AWS_272:Code signing is bypassed for this environment. Pipeline integrity is maintained via GitHub Actions OIDC identity validation and branch protection rules.
   # checkov:skip=CKV_AWS_173:KMS encryption is bypassed in dev to eliminate custom key costs; default cloud security is sufficient
@@ -201,7 +201,7 @@ resource "aws_lambda_function" "queue_worker" {
   }
 
   # Restricts this function to a safe maximum, protecting the rest of your AWS account pool from being exhausted during traffic spikes.
-  reserved_concurrent_executions = var.lambda_concurrency_limit
+ # reserved_concurrent_executions = var.lambda_concurrency_limit
 
   # Instructs AWS to capture performance metrics and downstream request traces.
   tracing_config {
