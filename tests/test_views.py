@@ -8,7 +8,7 @@ from restaurant.serializers import MenuSerializer
 # TestCase class to test MenuItemsView view
 class MenuViewTest(TestCase):
     # Method to add test instances to the MenuItem model
-    def setup(self):
+    def setUp(self):
         self.client = APIClient()   # Initialize the APIClient to simulate API requests
         # Create test instances of the MenuItem model
         MenuItem.objects.create(title="IceCream", price=1500, inventory=100)

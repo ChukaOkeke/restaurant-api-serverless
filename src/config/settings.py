@@ -127,9 +127,6 @@ else:
             'PASSWORD': db_credentials.get('password') or os.getenv('DB_PASSWORD'),
             'HOST': db_credentials.get('host') or os.getenv('DB_HOST'),
             'PORT': db_credentials.get('port', '5432') or os.getenv('DB_PORT', '5432'),
-            'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-            },
         }
     }
 
