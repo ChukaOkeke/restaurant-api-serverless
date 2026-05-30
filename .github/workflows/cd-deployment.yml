@@ -94,3 +94,26 @@ jobs:
         run: terraform apply -auto-approve
         env:
           TF_VAR_api_artifact_key: "deployments/asgard-api-artifact-${{ github.sha }}.zip"
+
+      # =========================================================================
+      # STEP 8: ZERO-TRUST DATABASE SCHEMA MIGRATION HOOK
+      # =========================================================================
+      - name: Invoke Lambda Execution Boundary to Sync Database
+        working-directory: ./infrastructure
+        run: |
+          FUNCTION_NAME=$(terraform output -raw api_function_name)
+          
+          aws lambda invoke \
+            --function-name "$FUNCTION_NAME" \
+            --payload '{"action": "migrate"}' \
+            --cli-binary-format raw-in-base64-out \
+            /migration_output.json
+            
+          echo "=== Lambda Invocation Summary Output ==="
+          cat migration_output.json
+          
+          # Force pipeline failure if the migration script crashed internally
+          if grep -q "MIGRATION CRASH" migration_output.json || grep -q "500" migration_output.json; then
+            echo "CRITICAL: Database migration failed inside the network boundary."
+            exit 1
+          fi

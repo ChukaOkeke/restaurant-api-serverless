@@ -14,6 +14,9 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import sys
+import json
+import boto3
+from botocore.exceptions import ClientError
 
 # Load environment variables from a .env file
 load_dotenv()  
@@ -22,16 +25,37 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+# 1. HELPER FUNCTION TO UNWRAP AWS SECRETS
+def get_aws_secret(secret_arn):
+    """Fetches and decodes a JSON secret from AWS Secrets Manager."""
+    if not secret_arn:
+        return {}
+    
+    # API Gateway/Lambda always injects AWS_REGION automatically
+    region_name = os.getenv('AWS_REGION', 'eu-west-1') 
+    client = boto3.client('secretsmanager', region_name=region_name)
+    
+    try:
+        response = client.get_secret_value(SecretId=secret_arn)
+        return json.loads(response['SecretString'])
+    except ClientError as e:
+        print(f"CRITICAL: Failed to retrieve secret {secret_arn}. Error: {e}")
+        return {}
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+# 2. RESOLVE CREDENTIALS
+# If we are in Lambda, these ARNs will be populated. If local, they will be None.
+db_secrets_arn = os.getenv('DATABASE_SECRET_ARN')
+app_secrets_arn = os.getenv('APP_SECRETS_ARN')
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# Fetch the dictionaries from AWS (or return empty dicts if local)
+db_credentials = get_aws_secret(db_secrets_arn)
+app_credentials = get_aws_secret(app_secrets_arn)
+
+# 3. SET THE DJANGO SECRETS
+# Fallback to standard os.getenv for local dev (.env file)
+SECRET_KEY = app_credentials.get('SECRET_KEY') or os.getenv('SECRET_KEY', 'unsafe-dev-key')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
-
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS','127.0.0.1,localhost').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 
 
 # Application definition
@@ -83,8 +107,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database CONFIGURATION (Pivoted to Aurora Serverless PostgreSQL)
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-# If running inside GitHub Actions or via pytest, use an isolated in-memory DB
-if os.getenv('CI', 'False') == 'True' or 'pytest' in sys.modules:
+# 4. DATABASE ROUTING
+if os.getenv('CI_MODE', 'False') == 'True' and not db_secrets_arn:
+    # Fallback for GitHub Actions testing
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -92,18 +117,16 @@ if os.getenv('CI', 'False') == 'True' or 'pytest' in sys.modules:
         }
     }
 else:
-    # The live PostgreSQL production/local development setup
+    # Production Aurora Serverless Routing
+    # AWS managed RDS secrets automatically provide 'username', 'password', 'host', and 'port'
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME'),
-            'USER': os.getenv('DB_USER'),
-            'PASSWORD': os.getenv('DB_PASSWORD'),
-            'HOST': os.getenv('DB_HOST'),
-            'PORT': os.getenv('DB_PORT', '5432'),
-            'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-                },
+            'NAME': 'asgard_cuisines_db', # Hardcoded to match the database_name in db/main.tf
+            'USER': db_credentials.get('username') or os.getenv('DB_USER'),
+            'PASSWORD': db_credentials.get('password') or os.getenv('DB_PASSWORD'),
+            'HOST': db_credentials.get('host') or os.getenv('DB_HOST'),
+            'PORT': db_credentials.get('port', '5432') or os.getenv('DB_PORT', '5432'),
         }
     }
 

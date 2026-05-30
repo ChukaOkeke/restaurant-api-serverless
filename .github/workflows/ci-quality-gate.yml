@@ -75,6 +75,7 @@ jobs:
       - name: "Execute Application Automated Test Suite (pytest)"
         env:
           DEBUG: "True"
+          CI_MODE: "True"
           SECRET_KEY: "ci-validation-stub-encryption-key-for-testing-perimeter" # satisfies Django's startup check so tests can run, without exposing real production credentials
           # CRITICAL ENV ADDITIONS FOR DISCOVERY:
           PYTHONPATH: src

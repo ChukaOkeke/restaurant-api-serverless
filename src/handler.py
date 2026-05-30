@@ -10,5 +10,25 @@ django.setup()
 # Instantiating the Asynchronous Server Gateway Interface core
 application = get_asgi_application()
 
-# Mangum translates API Gateway proxy events into standard ASGI HTTP contexts
-handler = Mangum(application, lifespan="off")
+def handler(event, context):
+    # Intercept custom operational triggers from your CI/CD pipeline
+    if isinstance(event, dict) and event.get("action") == "migrate":
+        from django.core.management import call_command
+        print("CRITICAL: Migration invocation event captured. Initializing schema sync...")
+        try:
+            # Executes python manage.py migrate programmatically inside the VPC
+            call_command("migrate", no_input=True)
+            return {
+                "statusCode": 200,
+                "body": "Database schema updates compiled successfully."
+            }
+        except Exception as e:
+            print(f"MIGRATION CRASH: {str(e)}")
+            return {
+                "statusCode": 500,
+                "body": f"Migration failed: {str(e)}"
+            }
+
+    # Standard inbound API web traffic cascades down to Mangum normally
+    asgi_handler = Mangum(application, lifespan="off")
+    return asgi_handler(event, context)
