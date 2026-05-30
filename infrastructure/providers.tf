@@ -5,8 +5,7 @@
 
 # Primary Regional Provider
 provider "aws" {
-  region  = var.aws_primary_region
-  profile = var.aws_primary_profile # Specify the AWS CLI profile 
+  region = var.aws_primary_region
   # Access keys can be set in the environment variables or through the AWS CLI configuration
 
   # Cascades the granular tagging strategy down to every single sub-resource
@@ -20,9 +19,17 @@ provider "aws" {
   }
 }
 
-# Global Edge Provider (For CloudFront WAF & ACM Certificate compliance)
+# Global Edge Provider (For CloudFront WAF & ACM Certificate compliance).
 provider "aws" {
-  alias   = "us_east_1"
-  region  = var.aws_cloudfront_compliance_region
-  profile = var.aws_cloudfront_compliance_profile # Specify the AWS CLI profile
+  alias  = "us_east_1"
+  region = var.aws_cloudfront_compliance_region
+
+  default_tags {
+    tags = {
+      Project     = "Restaurant-API"
+      CostCenter  = "Engineering"
+      Environment = var.environment
+      ManagedBy   = "Terraform"
+    }
+  }
 }
