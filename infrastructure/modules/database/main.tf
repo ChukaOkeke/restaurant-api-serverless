@@ -17,7 +17,7 @@ resource "aws_rds_cluster" "aurora_cluster" {
   cluster_identifier = "asgard-${var.environment}-postgres-cluster"
   engine             = "aurora-postgresql"
   engine_mode        = "provisioned" # Required for Serverless v2
-  engine_version     = "16.2"        # Recommended stable PostgreSQL version
+  engine_version     = "16.4"        # Recommended stable PostgreSQL version
 
   database_name   = "asgard_cuisines_db"
   master_username = "dbadmin"
