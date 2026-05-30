@@ -167,6 +167,7 @@ resource "aws_lambda_function" "web_api" {
       SQS_QUEUE_URL       = var.sqs_queue_id
       DEBUG               = "False"
       CI_MODE             = "True"
+      ALLOWED_HOSTS       = "*"
     }
   }
 
