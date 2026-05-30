@@ -69,6 +69,7 @@ module "compute" {
   lambda_sg_id             = module.vpc.lambda_sg_id
   aws_region               = var.aws_primary_region
   lambda_concurrency_limit = var.lambda_concurrency_limit
+  db_cluster_endpoint      = module.database.cluster_endpoint
 
   # Storage references
   s3_bucket_id     = module.storage.bucket_name

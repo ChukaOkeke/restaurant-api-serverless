@@ -38,7 +38,7 @@ def get_aws_secret(secret_arn):
     try:
         response = client.get_secret_value(SecretId=secret_arn)
         return json.loads(response['SecretString'])
-    except ClientError as e:
+    except Exception as e:
         print(f"CRITICAL: Failed to retrieve secret {secret_arn}. Error: {e}")
         return {}
 
