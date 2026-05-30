@@ -26,3 +26,7 @@ output "bucket_name" {
   value       = module.storage.bucket_name # Adjust path based on your module structure
   description = "The S3 bucket name for CI/CD uploads"
 }
+
+output "api_function_name" {
+  value = module.compute.web_api_function_name # Adjust based on your module outputs
+}
