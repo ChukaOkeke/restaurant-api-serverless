@@ -107,7 +107,7 @@ jobs:
             --function-name "$FUNCTION_NAME" \
             --payload '{"action": "migrate"}' \
             --cli-binary-format raw-in-base64-out \
-            /migration_output.json
+            migration_output.json
             
           echo "=== Lambda Invocation Summary Output ==="
           cat migration_output.json
