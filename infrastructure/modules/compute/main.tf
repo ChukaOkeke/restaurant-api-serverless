@@ -177,7 +177,7 @@ resource "aws_lambda_function" "web_api" {
   # checkov:skip=CKV_AWS_173:KMS encryption is bypassed in dev to eliminate custom key costs; default cloud security is sufficient
   # checkov:skip=CKV_AWS_116:Uses redrive policy with SQS DLQ for handling failed events instead of Lambda Destinations to allow for easier debugging and reprocessing of failed events during development without needing to set up additional infrastructure components.
   # checkov:skip=CKV_AWS_115:Concurrency limit is intentionally not set due to AWS Account Quota safety mechanism
-  
+
   depends_on = [aws_cloudwatch_log_group.api_logs]
 }
 
