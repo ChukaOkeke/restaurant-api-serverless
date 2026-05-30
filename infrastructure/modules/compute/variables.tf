@@ -66,3 +66,8 @@ variable "api_artifact_key" {
   type        = string
   description = "The S3 object key of the live application deployment zip (passed dynamically via CI/CD)"
 }
+
+variable "db_cluster_endpoint" {
+  type        = string
+  description = "The endpoint URL of the Aurora PostgreSQL cluster (injected from the Database module outputs)"
+}

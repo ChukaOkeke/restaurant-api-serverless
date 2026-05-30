@@ -170,6 +170,7 @@ resource "aws_lambda_function" "web_api" {
       ENVIRONMENT         = var.environment
       APP_SECRETS_ARN     = var.app_secrets_arn
       DATABASE_SECRET_ARN = var.rds_secret_arn
+      DB_HOST             = var.db_cluster_endpoint
       SQS_QUEUE_URL       = var.sqs_queue_id
       DEBUG               = "False"
       CI_MODE             = "False"
@@ -224,6 +225,7 @@ resource "aws_lambda_function" "queue_worker" {
       ENVIRONMENT         = var.environment
       APP_SECRETS_ARN     = var.app_secrets_arn
       DATABASE_SECRET_ARN = var.rds_secret_arn
+      DB_HOST             = var.db_cluster_endpoint
       DEBUG               = "False"
       CI_MODE             = "False"
     }
