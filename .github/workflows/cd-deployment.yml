@@ -38,7 +38,7 @@ jobs:
         with:
           directory: ./infrastructure
           framework: terraform
-          soft_fail: true 
+          soft_fail: false # Fail the pipeline if any issues are found 
 
       # STEP 3: Setup Terraform & Initialize
       - name: Setup Terraform
