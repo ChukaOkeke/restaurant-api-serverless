@@ -30,3 +30,8 @@ output "bucket_name" {
 output "api_function_name" {
   value = module.compute.web_api_function_name # Adjust based on your module outputs
 }
+
+output "static_bucket_name" {
+  value       = module.storage.static_assets_bucket_id
+  description = "The S3 bucket name for static assets, exposed for CI/CD synchronization."
+}

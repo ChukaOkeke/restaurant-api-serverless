@@ -87,7 +87,17 @@ jobs:
           echo "Uploading artifact to $BUCKET_NAME..."
           aws s3 cp ../asgard-api-artifact.zip s3://$BUCKET_NAME/deployments/asgard-api-artifact-${{ github.sha }}.zip
 
-      # STEP 7: PHASE 2 APPLY (Code Injection)
+      # STEP 7: Sync Static Assets to S3 Static Perimeter
+      - name: Deploy Static Media to S3 Edge
+        working-directory: ./infrastructure
+        run: |
+          echo "Fetching dynamic static asset bucket name from Terraform state..."
+          STATIC_BUCKET=$(terraform output -raw static_bucket_name)
+          
+          echo "Syncing images and asset payloads directly to s3://$STATIC_BUCKET/static/..."
+          aws s3 sync ../src/restaurant/static/ s3://$STATIC_BUCKET/static/ --delete
+
+      # STEP 8: PHASE 2 APPLY (Code Injection)
       # Now that the zip is in S3, we update Lambda to point to it.
       - name: Terraform Apply - Phase 2 (Application Update)
         working-directory: ./infrastructure
@@ -96,7 +106,7 @@ jobs:
           TF_VAR_api_artifact_key: "deployments/asgard-api-artifact-${{ github.sha }}.zip"
 
       # =========================================================================
-      # STEP 8: ZERO-TRUST DATABASE SCHEMA MIGRATION HOOK
+      # STEP 9: ZERO-TRUST DATABASE SCHEMA MIGRATION HOOK
       # =========================================================================
       - name: Invoke Lambda Execution Boundary to Sync Database
         working-directory: ./infrastructure

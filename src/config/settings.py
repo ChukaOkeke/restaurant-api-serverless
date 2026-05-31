@@ -88,7 +88,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -165,7 +165,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
 
 DJOSER={"USER_ID_FIELD":"username"}
 
@@ -187,7 +186,7 @@ STATICFILES_DIRS = []
 if os.getenv('USE_S3', 'False') == 'True':
     # AWS Credentials injected via Lambda Execution Role (No hardcoded keys!)
     AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-    AWS_S3_CUSTOM_DOMAIN = os.getenv('CLOUDFRONT_DOMAIN_NAME') # e.g., api.asgardcuisines.com
+    AWS_S3_CUSTOM_DOMAIN = os.getenv('CLOUDFRONT_DOMAIN_NAME') # e.g., asgardcuisines.link
     
     AWS_S3_OBJECT_PARAMETERS = {
         'CacheControl': 'max-age=86400',

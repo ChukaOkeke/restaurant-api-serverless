@@ -8,7 +8,7 @@ from .serializers import MenuSerializer, BookingSerializer
 # Create your views here.
 # Function-based view to render the homepage to the client.
 def index(request):
-    return render(request, 'index.html', {})
+    return render(request, 'restaurant/index.html')
 
 # Class-based view to handle Menu items
 class MenuItemsView(generics.ListCreateAPIView):
