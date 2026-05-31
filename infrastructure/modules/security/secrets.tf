@@ -4,7 +4,7 @@
 
 # 1. THE APP SECRET CONTAINER
 resource "aws_secretsmanager_secret" "app_secrets" {
-  name                    = "asgard-${var.environment}-app-secrets"
+  name                    = "asgard-${var.environment}-app-secretz"
   description             = "Secure container for Django runtime environment variables and API keys."
   recovery_window_in_days = 7 # FinOps safety: short window allows faster recreation testing if wiped
 
