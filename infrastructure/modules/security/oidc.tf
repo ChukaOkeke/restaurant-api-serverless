@@ -58,7 +58,7 @@ resource "aws_iam_role" "github_actions" {
 }
 
 # 5. ATTACH PERMISSIONS POLICY (Example placeholder: PowerUserAccess for infra provisioning)
-# In actual production, you would prune this to a tightly controlled custom architecture policy.
+# In actual production, you would prune this to a tightly controlled custom architecture policy
 resource "aws_iam_role_policy_attachment" "terraform_admin" {
   role       = aws_iam_role.github_actions.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"

@@ -39,7 +39,7 @@ class BookingViewSet(viewsets.ModelViewSet):
         
         queue_url = os.getenv('SQS_QUEUE_URL')
         
-        # Fallback for local SQLite testing or if the queue is missing in the environment
+        # Fallback for local SQLite testing or if the queue is missing in the environment.
         if not queue_url or os.getenv('CI_MODE') == 'True':
             self.perform_create(serializer)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
