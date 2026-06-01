@@ -3,9 +3,11 @@ name: CD - Asgard Zero-Trust Deployment
 on:
   push:
     branches: [ main ]
-    paths-ignore:
-      - 'README.md'
-      - '.gitignore'
+    paths:
+      - '.github/**'
+      - 'src/**'
+      - 'infrastructure/**'
+      - 'tests/**'
 
 env:
   AWS_REGION: "eu-west-1" # Adjust to match your AWS region
