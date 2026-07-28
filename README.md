@@ -1,5 +1,5 @@
 **Production-Grade Serverless Deployment**  
-A resilient, secure, production-grade, cloud-native serverless deployment, orchestrated using Terraform and GitHub Actions. This is version 3 of a continuously evolving cloud-native system. Version 1 was the local Docker Compose deployment, and version 2 was the local Kubernetes deployment with Observability.
+A resilient, secure, production-grade, cloud-native serverless deployment on AWS, orchestrated using Terraform and GitHub Actions. This is version 3 of a continuously evolving cloud-native system. Version 1 was the local Docker Compose deployment, and version 2 was the local Kubernetes deployment with Observability.
 
 **Project Scope**  
 This project focuses on automated cloud-native serverless application infrastructure deployment on AWS using Terraform and GitHub Actions. It implements enterprise-level zero-trust security via pipeline security scans, OIDC keyless authentication, and cloud environment hardening, and ensures state durability through S3/DynamoDB remote backends. High-level orchestration (EKS) and comprehensive observability are explored in later iterations.
