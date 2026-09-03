@@ -5,7 +5,7 @@
 # 1. IAM EXECUTION ROLE FOR LAMBDA FUNCTIONS (Unified Role for both Web API and Queue Worker)
 resource "aws_iam_role" "lambda_exec" {
   name        = "asgard-${var.environment}-lambda-execution-role"
-  description = "Unified execution identity role for the serverless application layer"
+  description = "Unified execution identity role for the serverless application layer."
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
