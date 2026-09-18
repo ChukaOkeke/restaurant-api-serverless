@@ -9,6 +9,7 @@ Follow these steps to bootstrap the Zero-Trust OIDC identity layer, provision th
 
  1. Prerequisites  
   - AWS Account: An active AWS account with permissions to provision VPCs, Lambda, API Gateway, Aurora Serverless v2, SQS, S3, and IAM roles.  
+  - Domain Name: An active domain name (asgardcuisines.link).
   - GitHub Account: For hosting the repository and executing the serverless CD deployment workflows.  
   - Terraform CLI: Installed locally to execute the initial local bootstrap phase.    
 
@@ -71,7 +72,28 @@ aws lambda invoke \
 ``` 
 
    - Verify Infrastructure Status: Review the migration_output.json file in your runner or local console to ensure a 200 OK status was returned.  
-   - Access the Live API: Query the Route 53-hosted domain name via a web browser to test the serverless api.  
+   - Access the Live API: The application will be available at http://asgardcuisines.link.
+
+**API Endpoints**  
+The API supports the following endpoints for managing menu items and table bookings.
+
+### API Endpoints
+
+| **Method** | **Endpoint** | **Description** | **Authentication** |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/` | Home Page | Public |
+| `GET` | `/api/menu-items/` | List all menu items | Public |
+| `POST` | `/api/menu-items/` | Create a new menu item | Admin Only |
+| `GET` | `/api/menu-items/<id>/` | Get details of a specific item | Public |
+| `PUT/PATCH` | `/api/menu-items/<id>/` | Update a menu item | Admin Only |
+| `DELETE` | `/api/menu-items/<id>/` | Remove an item | Admin Only |
+| `GET` | `/api/booking/tables/` | View all active bookings | Authenticated |
+| `POST` | `/api/booking/tables/` | Create a new table reservation | Authenticated |
+| `DELETE` | `/api/booking/tables/<id>/` | Cancel a reservation | Owner/Staff |
+| `GET` | `/auth/users/` | List all registered users | Admin Only |
+| `POST` | `/auth/users/` | Register a new user | Public |
+| `POST` | `/auth/token/login` | Generate an auth token for session access | Public |
+| `POST` | `/auth/users/logout` | Logout the user | Public |  
 
 **1. Problem & Non-Functional Requirements (NFRs)**  
  **Problem Statement**  
